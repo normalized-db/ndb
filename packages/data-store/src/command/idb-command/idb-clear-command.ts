@@ -1,8 +1,7 @@
-import { NotFoundError } from '@normalized-db/core';
-import { Transaction } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { ClearedEvent } from '../../event/cleared-event';
 import { IdbLogger } from '../../logging/idb-logging/idb-logger';
+import type { IdbWriteTransaction } from '../../utility/idb';
 import { ClearCommand } from '../clear-command';
 import { IdbBaseCommand } from './idb-base-command';
 
@@ -34,7 +33,7 @@ export class IdbClearCommand extends IdbBaseCommand<IdbContext<any>> implements 
       }
     }
 
-    let transaction: Transaction;
+    let transaction: IdbWriteTransaction;
     try {
       transaction = await this._context.write(involvedTypes);
     } catch (e) {
@@ -44,7 +43,7 @@ export class IdbClearCommand extends IdbBaseCommand<IdbContext<any>> implements 
 
     try {
       involvedTypes.forEach(osn => transaction.objectStore(osn).clear());
-      await transaction.complete;
+      await transaction.done;
     } catch (e) {
       try {
         transaction.abort();

@@ -1,7 +1,7 @@
 import { ISchema } from '@normalized-db/core';
 import { IDenormalizerBuilder } from '@normalized-db/denormalizer';
 import { INormalizerBuilder } from '@normalized-db/normalizer';
-import { DB, default as DBFactory, Transaction, UpgradeDB } from 'idb';
+import { type IDBPDatabase, openDB } from 'idb';
 import { CommandFactory } from '../../command/command-factory';
 import { IdbCommandFactory } from '../../command/idb-command/idb-command-factory';
 import { IdbLogger } from '../../logging/idb-logging/idb-logger';
@@ -9,6 +9,7 @@ import { Logger } from '../../logging/logger';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { IdbQueryRunnerFactory } from '../../query/runner/idb-runner/idb-query-runner-factory';
 import { QueryRunnerFactory } from '../../query/runner/query-runner-factory';
+import type { IdbReadTransaction, IdbWriteTransaction } from '../../utility/idb';
 import { Context } from '../context';
 import { IdbConfig } from './idb-config';
 
@@ -16,7 +17,7 @@ export class IdbContext<Types extends DataStoreTypes> extends Context<Types> {
 
   protected readonly _logger = new IdbLogger<Types>(this);
 
-  protected _db: DB;
+  protected _db: IDBPDatabase;
 
   constructor(schema: ISchema,
               normalizerBuilder: INormalizerBuilder,
@@ -32,11 +33,16 @@ export class IdbContext<Types extends DataStoreTypes> extends Context<Types> {
 
   public async open(): Promise<void> {
     if (!this.isReady()) {
-      this._db = await DBFactory.open(
-        this.dbConfig.name,
-        this.dbConfig.version,
-        this.dbConfig.upgrade || this.onUpgradeNeeded
-      );
+      const self = this;
+      this._db = await openDB(this.dbConfig.name, this.dbConfig.version, {
+        upgrade(database, oldVersion, newVersion, transaction, event) {
+          if (self.dbConfig.upgrade) {
+            self.dbConfig.upgrade(database, oldVersion, newVersion);
+          } else {
+            self.onUpgradeNeeded(database);
+          }
+        },
+      });
     }
   }
 
@@ -68,23 +74,23 @@ export class IdbContext<Types extends DataStoreTypes> extends Context<Types> {
     }
 
     if (autoCloseContext) {
-      this.close();
+      await this.close();
     }
 
     return osnArray;
   }
 
-  public async read(stores: string | string[] = this._schema.getTypes()): Promise<Transaction> {
+  public async read(stores: string | string[] = this._schema.getTypes()): Promise<IdbReadTransaction> {
     await this.open();
     return this._db.transaction(stores, 'readonly');
   }
 
-  public async write(stores: string | string[] = this._schema.getTypes()): Promise<Transaction> {
+  public async write(stores: string | string[] = this._schema.getTypes()): Promise<IdbWriteTransaction> {
     await this.open();
     return this._db.transaction(stores, 'readwrite');
   }
 
-  private onUpgradeNeeded(upgradeDb: UpgradeDB) {
+  private onUpgradeNeeded(upgradeDb: IDBPDatabase) {
     this._logger.onUpgradeNeeded(upgradeDb);
     this._schema.getTypes()
       .filter(type => !upgradeDb.objectStoreNames.contains(type))

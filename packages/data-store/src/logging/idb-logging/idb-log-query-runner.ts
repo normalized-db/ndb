@@ -1,8 +1,8 @@
 import { isNull } from '@normalized-db/core';
-import { ObjectStore, Transaction } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { InvalidQueryRunnerStatusError } from '../../error/index';
 import { DataStoreTypes } from '../../model/data-store-types';
+import type { IdbReadStore, IdbReadTransaction } from '../../utility/idb';
 import { LogEntry } from '../model/log-entry';
 import { LogQueryConfig } from '../query/log-query-config';
 import { LogQueryRunner } from '../query/log-query-runner';
@@ -12,8 +12,8 @@ export class IdbLogQueryRunner<Types extends DataStoreTypes> implements LogQuery
 
   private readonly result: LogEntry<Types>[] = [];
 
-  private transaction: Transaction;
-  private logStore: ObjectStore;
+  private transaction: IdbReadTransaction;
+  private logStore: IdbReadStore<'_logs'>;
 
   constructor(private readonly _context: IdbContext<Types>,
               private readonly _config: LogQueryConfig) {

@@ -1,11 +1,11 @@
 import { isNull, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/core';
-import { Transaction } from 'idb';
+import { IDBPTransaction } from 'idb';
 import { ListResult, ListResultBuilder } from '../../list-result/index';
 import { IdbBaseQueryRunner } from './idb-base-query-runner';
 
 export abstract class IdbBaseDocumentQueryRunner<Result extends NdbDocument> extends IdbBaseQueryRunner {
 
-  protected _transaction: Transaction;
+  protected _transaction: IDBPTransaction;
 
   /**
    * Find all items pre-filtered by their primary key. Paging and further filtering will be applied as defined

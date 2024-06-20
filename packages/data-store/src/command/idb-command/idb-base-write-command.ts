@@ -1,9 +1,9 @@
 import { isNull, NdbDocument, NotFoundError, TypeMismatchError, ValidKey } from '@normalized-db/core';
-import { Cursor, ObjectStore, Transaction } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { CreatedEvent } from '../../event/created-event';
 import { UpdatedEvent } from '../../event/updated-event';
 import { Parent } from '../../model/parent';
+import type { IdbWriteCursor, IdbWriteStore, IdbWriteTransaction } from '../../utility/idb';
 import { RefsWriteUtility } from '../../utility/refs-write';
 import { IdbBaseCommand } from './idb-base-command';
 
@@ -84,14 +84,14 @@ export abstract class IdbBaseWriteCommand<T extends NdbDocument> extends IdbBase
 
   /**
    * Merge each field of `newItem` into the cursor's current value so an update is possible field by field and not only
-   * entire objects. Furthermore the `_refs`-field created during normalization must be merged.
+   * entire objects. Furthermore, the `_refs`-field created during normalization must be merged.
    *
-   * @param {Cursor} cursor
+   * @param {IdbWriteCursor} cursor
    * @param {NdbDocument} newItem
    * @param {boolean} isPartialUpdate
    * @returns {Promise<object>}
    */
-  private async updateCursor(cursor: Cursor, newItem: NdbDocument, isPartialUpdate: boolean): Promise<object> {
+  private async updateCursor(cursor: IdbWriteCursor, newItem: NdbDocument, isPartialUpdate: boolean): Promise<object> {
     let mergedItem: NdbDocument;
     if (isPartialUpdate) {
       mergedItem = cursor.value;
@@ -125,10 +125,11 @@ export abstract class IdbBaseWriteCommand<T extends NdbDocument> extends IdbBase
     }
 
     await cursor.update(mergedItem);
+
     return mergedItem;
   }
 
-  private async addToParents(transaction: Transaction, parent: Parent | Parent[], keys: ValidKey[]): Promise<void> {
+  private async addToParents(transaction: IdbWriteTransaction, parent: Parent | Parent[], keys: ValidKey[]): Promise<void> {
     if (keys && keys.length === 0) {
       return;
     }
@@ -140,7 +141,7 @@ export abstract class IdbBaseWriteCommand<T extends NdbDocument> extends IdbBase
     }
   }
 
-  private async addToParent(transaction: Transaction, parent: Parent, keys: ValidKey[]): Promise<void> {
+  private async addToParent(transaction: IdbWriteTransaction, parent: Parent, keys: ValidKey[]): Promise<void> {
     const parentItem = await transaction.objectStore(parent.type).get(parent.key);
     if (isNull(parentItem)) {
       throw new NotFoundError(parent.type, parent.key);
@@ -155,11 +156,11 @@ export abstract class IdbBaseWriteCommand<T extends NdbDocument> extends IdbBase
         transaction,
         parent,
         parentItem,
-        keys
+        keys,
     );
   }
 
-  private async addKeysToParentsHelper(transaction: Transaction,
+  private async addKeysToParentsHelper(transaction: IdbWriteTransaction,
                                        parent: Parent,
                                        parentItem: NdbDocument,
                                        keys: ValidKey[]): Promise<void> {
@@ -213,7 +214,7 @@ export abstract class IdbBaseWriteCommand<T extends NdbDocument> extends IdbBase
     }
   }
 
-  private async getLatestKey(objectStore: ObjectStore): Promise<ValidKey | null> {
+  private async getLatestKey(objectStore: IdbWriteStore): Promise<ValidKey | null> {
     const cursor = await objectStore.openCursor(null, 'prevunique');
     return cursor ? cursor.key as ValidKey : null;
   }

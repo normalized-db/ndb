@@ -1,7 +1,7 @@
 import { isNull } from '@normalized-db/core';
-import { ObjectStore } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { DataStoreTypes } from '../../model/data-store-types';
+import type { IdbWriteStore } from '../../utility/idb';
 import { ClearLogsCommand } from '../clear-command/clear-logs-command';
 import { ClearLogsOptions } from '../clear-command/clear-logs-options';
 import { LogEntry } from '../model/log-entry';
@@ -77,7 +77,7 @@ export class IdbClearLogsCommand<Types extends DataStoreTypes> implements ClearL
     await Promise.all(requests);
   }
 
-  private async getWritableObjectStore(): Promise<ObjectStore> {
+  private async getWritableObjectStore() {
     return (await this._context.write(IdbLogger.OBJECT_STORE)).objectStore(IdbLogger.OBJECT_STORE);
   }
 }

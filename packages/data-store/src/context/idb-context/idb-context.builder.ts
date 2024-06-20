@@ -8,7 +8,7 @@ export class IdbContextBuilder<Types extends DataStoreTypes> extends ContextBuil
 
   protected _dbName: string;
   protected _dbVersion: number;
-  protected _dbUpgrade: (UpgradeDB) => void;
+  protected _dbUpgrade: (IDBPDatabase) => void;
 
   public dbName(value: string) {
     this._dbName = value;
@@ -20,7 +20,7 @@ export class IdbContextBuilder<Types extends DataStoreTypes> extends ContextBuil
     return this;
   }
 
-  public dbUpgrade(value: (UpgradeDB) => void) {
+  public dbUpgrade(value: (IDBPDatabase) => void) {
     this._dbUpgrade = value;
     return this;
   }

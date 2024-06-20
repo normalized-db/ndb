@@ -1,5 +1,7 @@
+import { type IDBPDatabase } from 'idb';
+
 export interface IdbConfig {
   name: string;
   version: number;
-  upgrade?: (UpgradeDB) => void;
+  upgrade?: (db: IDBPDatabase, oldVersion: number, newVersion: number) => void;
 }

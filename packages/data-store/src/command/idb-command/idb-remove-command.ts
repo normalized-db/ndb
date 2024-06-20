@@ -1,9 +1,9 @@
 import { isNull, IStore, IStoreTarget, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/core';
-import { ObjectStore, Transaction } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { EmptyInputError } from '../../error/empty-input-error';
 import { RemovedEvent } from '../../event/removed-event';
 import { Parent } from '../../model/parent';
+import type { IdbWriteStore, IdbWriteTransaction } from '../../utility/idb';
 import { isValidKey } from '../../utility/valid-key';
 import { RemoveCommand } from '../remove-command';
 import { IdbBaseCommand } from './idb-base-command';
@@ -51,14 +51,14 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
 
   private async executeRecursive(type: string,
                                  item: NdbDocument,
-                                 transaction: Transaction,
-                                 objectStore: ObjectStore): Promise<void> {
+                                 transaction: IdbWriteTransaction,
+                                 objectStore: IdbWriteStore): Promise<void> {
     const config = this.schema.getConfig(type);
     const key = this.getKey(item, config);
     await Promise.all([
       this.cascadeRemoval(transaction, config.targets, type, item),
       this.updateParents(transaction, type, item),
-      objectStore.delete(key)
+      objectStore.delete(key),
     ]);
 
     this._eventQueue.enqueue(new RemovedEvent(type, item, key));
@@ -66,7 +66,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
 
   // region remove dependent child entities
 
-  private async cascadeRemoval(transaction: Transaction,
+  private async cascadeRemoval(transaction: IdbWriteTransaction,
                                targets: IStoreTarget,
                                type: string,
                                oldItem: any): Promise<void> {
@@ -83,7 +83,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
     }));
   }
 
-  private async removeTarget(transaction: Transaction,
+  private async removeTarget(transaction: IdbWriteTransaction,
                              parentType: string,
                              parentKey: ValidKey,
                              targetType: string,
@@ -111,7 +111,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
 
   // region update parents
 
-  private async updateParents(transaction: Transaction, oldItemType: string, oldItem: NdbDocument): Promise<void> {
+  private async updateParents(transaction: IdbWriteTransaction, oldItemType: string, oldItem: NdbDocument): Promise<void> {
     if ('_refs' in oldItem) {
       const oldItemKey = this.getKey(oldItem, this.schema.getConfig(oldItemType));
       await Promise.all(Object.keys(oldItem['_refs']).map(async refType => {
@@ -130,7 +130,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
             oldItemKey,
             objectStore,
             current.value,
-            parentFields
+            parentFields,
           ));
           current = it.next();
         }
@@ -154,7 +154,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
   private async removeFromParent(oldItemType: string,
                                  oldItem: NdbDocument,
                                  oldItemKey: ValidKey,
-                                 parentObjectStore: ObjectStore,
+                                 parentObjectStore: IdbWriteStore,
                                  parentKey: ValidKey,
                                  fields: string[]): Promise<void> {
     const parentCursor = await parentObjectStore.openCursor(parentKey);
@@ -163,7 +163,7 @@ export class IdbRemoveCommand<T extends NdbDocument> extends IdbBaseCommand<T | 
         oldItemType,
         oldItem,
         oldItemKey,
-        new Parent(parentObjectStore.name, parentKey, field)
+        new Parent(parentObjectStore.name, parentKey, field),
       ));
 
       let parentChanged = false;

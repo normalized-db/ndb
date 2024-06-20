@@ -1,5 +1,5 @@
 import { isNull, NdbDocument, NotFoundError } from '@normalized-db/core';
-import { ObjectStore } from 'idb';
+import { IDBPObjectStore } from 'idb';
 import { IdbBaseWriteCommand } from './idb-base-write-command';
 
 export abstract class IdbBaseUpdateCommand<T extends NdbDocument> extends IdbBaseWriteCommand<T> {
@@ -15,7 +15,7 @@ export abstract class IdbBaseUpdateCommand<T extends NdbDocument> extends IdbBas
     return super.write(data, null, isPartialUpdate);
   }
 
-  private async checkExistence(objectStore: ObjectStore, item: T): Promise<void> {
+  private async checkExistence(objectStore: IDBPObjectStore, item: T): Promise<void> {
     const key = this.getKey(item);
     const existingItem = objectStore.get(key);
     if (isNull(existingItem)) {

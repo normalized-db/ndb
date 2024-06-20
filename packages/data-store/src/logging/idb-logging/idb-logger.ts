@@ -1,5 +1,4 @@
-import { LogMode } from '@normalized-db/core';
-import { UpgradeDB } from 'idb';
+import { IDBPDatabase } from 'idb';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { BaseEvent } from '../../event/base-event';
 import { OnDataChanged } from '../../event/utility/on-data-changed';
@@ -29,7 +28,7 @@ export class IdbLogger<Types extends DataStoreTypes> extends Logger<Types, IdbCo
     super(idbContext);
   }
 
-  public onUpgradeNeeded(upgradeDb: UpgradeDB): void {
+  public onUpgradeNeeded(upgradeDb: IDBPDatabase): void {
     if (!upgradeDb.objectStoreNames.contains(IdbLogger.OBJECT_STORE)) {
       const logStore = upgradeDb.createObjectStore(IdbLogger.OBJECT_STORE, { keyPath: 'id', autoIncrement: true });
       logStore.createIndex(IdbLogger.IDX_TIME, 'time');
@@ -56,7 +55,7 @@ export class IdbLogger<Types extends DataStoreTypes> extends Logger<Types, IdbCo
   public async clear(options?: ClearLogsOptions<Types>): Promise<boolean> {
     const cmd = new IdbClearLogsCommand<Types>(this._context);
     const success = await cmd.execute(options);
-    this.autoCloseContext(options);
+    await this.autoCloseContext(options);
     return success;
   }
 
