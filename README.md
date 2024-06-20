@@ -1,2 +1,3 @@
-# ndb
-Updated mono-repo version of normalized-db libraries
+# @normalized-db/ndb
+
+Mono-repo version of normalized-db libraries

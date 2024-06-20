@@ -1,0 +1,20 @@
+{
+  "name": "ndb",
+  "description": "Mono-repo version of normalized-db libraries",
+  "keywords": [
+    "offline-first",
+    "indexeddb",
+    "data-structures",
+    "normalization"
+  ],
+  "author": "Sandro Schleu",
+  "license": "MIT",
+  "homepage": "https://github.com/normalized-db/ndb#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/normalized-db/ndb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/normalized-db/ndb/issues"
+  }
+}

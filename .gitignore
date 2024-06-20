@@ -1,0 +1,15 @@
+# IDE
+.idea/*
+!.idea/codeStyles
+
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build
+dist/
+lib/
+
+# Logs
+logs/
+*.log
