@@ -97,7 +97,7 @@ export class Schema implements ISchema {
   }
 
   private expandSchemaForType(type: string): IStore {
-    if (type in this.userConfig && this.userConfig[type] !== false) {
+    if (type in this.userConfig && this.userConfig[type]) {
       const typeSchema = this.userConfig[type];
 
       if (type === Schema.TYPE_DEFAULTS) {
