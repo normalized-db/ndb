@@ -6,6 +6,7 @@ import * as Blog from './data/blog-post';
 import * as User from './data/user';
 
 chai.use(chaiAsPromised);
+
 const assert = chai.assert;
 const expect = chai.expect;
 

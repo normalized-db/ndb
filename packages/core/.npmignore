@@ -16,4 +16,3 @@ tsconfig.json
 tslint.json
 
 webpack.config.js
-karma.conf.js
