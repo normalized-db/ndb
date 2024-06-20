@@ -144,7 +144,7 @@ export class LogQuery<Types extends DataStoreTypes> implements Queryable<LogEntr
     await this._context.open();
     const runner = this._context.logger().queryRunner(this.getQueryConfig());
     this._cachedResult = await runner.execute();
-    this.autoClose();
+    await this.autoClose();
     return this._cachedResult;
   }
 

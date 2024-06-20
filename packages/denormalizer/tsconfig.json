@@ -1,24 +1,27 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    // Building
     "outDir": "./dist",
     "baseUrl": "./",
-    "strict": false,
+    "target": "ESNEXT",
+    "useDefineForClassFields": true,
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "lib": ["ESNEXT", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    // Emit
+    "declaration": true,
     "sourceMap": true,
     "inlineSourceMap": false,
-    "declaration": true,
     "removeComments": true,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "noEmitOnError": true,
     "emitDeclarationOnly": true,
-    "target": "ES2020",
-    "esModuleInterop": true,
-    "lib": [
-      "ES2020",
-      "DOM"
-    ]
+    "emitDecoratorMetadata": true,
+    // Linting
+    "strict": false,
+    "experimentalDecorators": true
   },
   "exclude": [
     "node_modules",

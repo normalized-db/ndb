@@ -6,8 +6,9 @@ const config: Config = {
   plugins: [],
   theme: {
     colors: {
-      brand: colors.sky,
+      brand: colors.slate,
       disabled: colors.neutral,
+      error: colors.red,
     },
   },
 };

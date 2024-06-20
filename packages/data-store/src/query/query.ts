@@ -156,7 +156,7 @@ export class Query<DbItem extends NdbDocument>
     const runner = this._context.queryRunnerFactory().queryRunner<DbItem>(this.getQueryConfig());
     await this._context.open();
     this._cachedResult = (await runner.execute()) || new ListResult<DbItem>();
-    this.autoClose();
+    await this.autoClose();
     return this._cachedResult;
   }
 

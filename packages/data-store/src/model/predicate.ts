@@ -1,1 +1,1 @@
-export type Predicate<T> = (T) => boolean | Promise<boolean>;
+export type Predicate<T> = (item: T) => boolean | Promise<boolean>;

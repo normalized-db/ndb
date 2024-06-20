@@ -77,7 +77,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
                                                 options?: CreateOptions): Promise<boolean> {
     const cmd = this._context.commandFactory().createCommand<Item>(type);
     const success = await cmd.execute(item, options ? options.parent : null);
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 
@@ -96,7 +96,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
                                                 options?: UpdateOptions): Promise<boolean> {
     const cmd = this._context.commandFactory().updateCommand<Item>(type);
     const success = await cmd.execute(item, options && options.isPartialUpdate);
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 
@@ -114,7 +114,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
   public async set<Data extends object>(type: Types, key: ValidKey, data: Data, options?: SetOptions): Promise<boolean> {
     const cmd = this._context.commandFactory().setCommand<Data>(type);
     const success = await cmd.execute(key, data);
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 
@@ -131,7 +131,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
     const success = await (options
         ? cmd.execute(item, options.parent, options.isPartialUpdate)
         : cmd.execute(item));
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 
@@ -149,7 +149,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
                                                 options?: RemoveOptions): Promise<boolean> {
     const cmd = this._context.commandFactory().removeCommand<Item>(type);
     const success = await cmd.execute(item);
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 
@@ -162,7 +162,7 @@ export class DataStore<Types extends DataStoreTypes> implements IDataStore<Types
    */
   public async clear(type?: string | string[], options?: ClearOptions): Promise<boolean> {
     const success = await this._context.commandFactory().clearCommand(options && options.includeLogs).execute(type);
-    this.autoClose(options);
+    await this.autoClose(options);
     return success;
   }
 

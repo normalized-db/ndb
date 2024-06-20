@@ -110,7 +110,7 @@ export class SingleItemQuery<DbItem extends NdbDocument>
     const runner = this._context.queryRunnerFactory().singleItemQueryRunner<DbItem>(this.getQueryConfig());
     await this._context.open();
     this._cachedResult = (await runner.execute()) || this._default;
-    this.autoClose();
+    await this.autoClose();
     return this._cachedResult;
   }
 

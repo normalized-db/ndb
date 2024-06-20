@@ -1,5 +1,5 @@
 {
-  "name": "@normalized-db/example-vue",
+  "name": "@ndb-examples/vue",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.4.21"
+    "@normalized-db/core": "workspace:*",
+    "@normalized-db/normalizer": "workspace:*",
+    "@normalized-db/denormalizer": "workspace:*",
+    "@normalized-db/data-store": "workspace:*",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

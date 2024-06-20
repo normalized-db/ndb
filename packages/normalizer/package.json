@@ -14,6 +14,14 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "./README.md",
+    "./package.json",
+    "./dist/*"
+  ],
   "scripts": {
     "lint": "tslint --force ./src/*.ts ./src/**/*.ts",
     "lint-fix": "tslint --force --fix ./src/*.ts ./src/**/*.ts",

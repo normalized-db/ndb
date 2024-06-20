@@ -48,7 +48,7 @@ export class CountQuery<DbItem extends NdbDocument> extends BaseQuery<number> im
     const runner = this._context.queryRunnerFactory().countQueryRunner(this.getQueryConfig());
     await this._context.open();
     this._cachedResult = await runner.execute();
-    this.autoClose();
+    await this.autoClose();
     return this._cachedResult;
   }
 
