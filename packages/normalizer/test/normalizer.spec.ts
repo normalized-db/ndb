@@ -1,14 +1,8 @@
+import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
 import { deepClone, ISchemaConfig, ValidKey } from '@normalized-db/core';
-import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
 import { INormalizer, NormalizerBuilder } from '../src';
 import * as Blog from './data/blog-post';
 import * as User from './data/user';
-
-chai.use(chaiAsPromised);
-
-const assert = chai.assert;
-const expect = chai.expect;
 
 describe('Normalizer', function () {
 
@@ -19,7 +13,7 @@ describe('Normalizer', function () {
 
   async function test(rootEntity: string) {
     const result = await normalizer.apply(rootEntity, data);
-    assert.deepEqual(result, normalizedData);
+    expect(result).toEqual(normalizedData);
   }
 
   afterEach(function () {
@@ -38,10 +32,10 @@ describe('Normalizer', function () {
   };
 
   const random = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
-  const uniqueKeyCallback = (type: string) => new Promise<ValidKey>((
+  const uniqueKeyCallback = () => new Promise<ValidKey>((
       resolve => setTimeout(() => resolve(nextKey()), random(10, 500))));
 
-  describe('Invalid types', async function () {
+  describe('Invalid types', function () {
 
     beforeEach(function () {
       schemaConfig = User.SCHEMA;
@@ -52,8 +46,8 @@ describe('Normalizer', function () {
     });
 
     it('Apply', async function () {
-      await assert.isFulfilled(normalizer.apply('user', {}), 'Type "user" is not configured');
-      await assert.isRejected(normalizer.apply('invalid', {}), 'Type "invalid" is not configured');
+      await expect(normalizer.apply('user', {})).resolves.not.toBeNull();
+      await expect(normalizer.apply('invalid', {})).rejects.toEqual(new Error('Type "invalid" is not configured'));
     });
 
   });
@@ -91,7 +85,7 @@ describe('Normalizer', function () {
       await test('user');
     });
 
-    describe('Normalized Data', async function () {
+    describe('Normalized Data', function () {
 
       it('Single Item', async function () {
         data = normalizedData.user[0];
@@ -109,7 +103,7 @@ describe('Normalizer', function () {
         data = [
           data[0],
           normalizedData.user[1],
-          data[2]
+          data[2],
         ];
         await test('user');
       });
@@ -133,7 +127,7 @@ describe('Normalizer', function () {
         article: [Blog.normalizePost(Blog.POST1)],
         comment: Blog.normalizeAllComments(Blog.POST1.comments),
         user: Blog.normalizeAllUsers([Blog.USER_MMUSTER, Blog.USER_TIMLER42, Blog.USER_ALEXK]),
-        role: [Blog.ROLE2, Blog.ROLE1]
+        role: [Blog.ROLE2, Blog.ROLE1],
       };
 
       await test('article');
@@ -156,12 +150,12 @@ describe('Normalizer', function () {
       await test('article');
     });
 
-    describe('Invalid data', async function () {
+    describe('Invalid data', function () {
 
-      async function testError(error) {
+      async function testError(error: string) {
         // assert.throws(() => normalizer.apply('article', data), error);
         // expect(normalizer.apply('article', data)).to.be.throws(error);
-        await assert.isRejected(normalizer.apply('article', data), error);
+        await expect(normalizer.apply('article', data)).rejects.toEqual(new Error(error));
       }
 
       it('Expected array', async function () {

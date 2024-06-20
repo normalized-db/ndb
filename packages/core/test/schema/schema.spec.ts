@@ -1,6 +1,5 @@
-import { assert } from 'chai';
+import { describe, expect, it } from '@jest/globals';
 import { Schema } from '../../src';
-
 import * as Blog from '../data/blog-post';
 import * as User from '../data/user';
 
@@ -11,7 +10,7 @@ describe('Schema', function () {
     function test(schema: Schema, expectedResult) {
       const schemaJSON = schema.toString();
       const expectedJSON = JSON.stringify(expectedResult);
-      assert.strictEqual(schemaJSON, expectedJSON);
+      expect(schemaJSON).toEqual(expectedJSON);
     }
 
     it('User', function () {

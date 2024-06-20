@@ -16,5 +16,16 @@
   },
   "bugs": {
     "url": "https://github.com/normalized-db/ndb/issues"
+  },
+  "scripts": {
+    "lint": "pnpm --filter \"@normalized-db/*\" lint",
+    "build": "pnpm --filter \"@normalized-db/*\" build",
+    "cleanup": "pnpm --filter \"@normalized-db/*\" cleanup",
+    "test": "pnpm cleanup && jest",
+    "bundle": "pnpm run lint && pnpm run build"
+  },
+  "dependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5"
   }
 }

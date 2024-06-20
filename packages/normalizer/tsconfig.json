@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./",
+    "outDir": "./dist",
     "baseUrl": "./src",
     "strict": false,
     "sourceMap": true,
@@ -11,15 +11,19 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "noEmitOnError": true,
+    "emitDeclarationOnly": true,
+    "target": "ES2015",
+    "esModuleInterop": true,
     "lib": [
-      "es2015",
-      "dom"
+      "ES2015",
+      "DOM"
     ]
   },
   "exclude": [
     "node_modules",
     "test",
-    "lib"
+    "dist",
+    "jest.config.ts"
   ]
 }

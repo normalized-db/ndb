@@ -1,6 +1,5 @@
-import { assert } from 'chai';
+import { describe, expect, it } from '@jest/globals';
 import { Schema, SchemaBuilder, StoreLogBuilder } from '../../src';
-
 import * as Blog from '../data/blog-post';
 import * as User from '../data/user';
 
@@ -9,7 +8,7 @@ describe('Schema-Builder', function () {
   function test(schemaBuilder: SchemaBuilder, expectedResult: any) {
     const schemaJSON = new Schema(schemaBuilder.build).toString();
     const expectedJSON = JSON.stringify(expectedResult);
-    assert.strictEqual(schemaJSON, expectedJSON);
+    expect(schemaJSON).toEqual(expectedJSON);
   }
 
   it('User', function () {

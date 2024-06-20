@@ -1,4 +1,4 @@
-import { ValidKey } from '@normalized-db/core/lib/src/model/valid-key';
+import { ValidKey } from '@normalized-db/core';
 import { Parent } from '../../model/parent';
 import { Predicate } from '../../model/predicate';
 import { LogAction } from '../model/log-action';

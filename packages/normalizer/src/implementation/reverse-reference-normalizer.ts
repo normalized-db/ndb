@@ -1,5 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
-import { ValidKey } from '@normalized-db/core/lib/src/model/valid-key';
+import { NdbDocument, ValidKey } from '@normalized-db/core';
 import { Parent } from '../model/parent';
 import { BasicNormalizer } from './basic-normalizer';
 

@@ -21,7 +21,7 @@ import {
   USER_MMUSTER,
   USER_PLUSTIG,
   USER_TIMLER42,
-  withRevRef
+  withRevRef,
 } from './data';
 import { SCHEMA } from './schema';
 
@@ -49,5 +49,5 @@ export {
   DATA,
   DATA_NORMALIZED,
   DATA_NORMALIZED_RR,
-  SCHEMA
+  SCHEMA,
 };

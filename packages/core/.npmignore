@@ -6,13 +6,9 @@ npm-debug.log
 
 src/
 test/
+index.ts
 
 .gitignore
 .npmignore
-
-index.ts
-
 tsconfig.json
 tslint.json
-
-webpack.config.js

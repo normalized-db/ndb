@@ -1,5 +1,4 @@
-import { Depth, ValidKey } from '@normalized-db/core';
-import { NdbDocument } from '@normalized-db/core/lib/src/model/ndb-document';
+import { Depth, NdbDocument, ValidKey } from '@normalized-db/core';
 import { Parent } from '../../model/parent';
 import { Filter } from './filter';
 import { OrderBy } from './order-by';

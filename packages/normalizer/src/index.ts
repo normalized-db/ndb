@@ -6,5 +6,5 @@ export * from './model';
 
 export {
   INormalizer,
-  Normalizer
+  Normalizer,
 };

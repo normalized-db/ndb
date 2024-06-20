@@ -1,16 +1,4 @@
-import {
-  DATA,
-  DATA_NORMALIZED,
-  DATA_NORMALIZED_RR,
-  normalize,
-  normalizeAll,
-  reverseRole,
-  ROLE1,
-  ROLE2,
-  USER1,
-  USER2,
-  USER3
-} from './data';
+import { DATA, DATA_NORMALIZED, DATA_NORMALIZED_RR, normalize, normalizeAll, reverseRole, ROLE1, ROLE2, USER1, USER2, USER3 } from './data';
 import { SCHEMA } from './schema';
 
 export {
@@ -25,5 +13,5 @@ export {
   USER3,
   DATA,
   DATA_NORMALIZED,
-  DATA_NORMALIZED_RR
+  DATA_NORMALIZED_RR,
 };
