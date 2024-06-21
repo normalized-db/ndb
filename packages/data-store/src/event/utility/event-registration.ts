@@ -1,4 +1,4 @@
-import { EventSelection, EventType, isNull, ValidKey } from '@normalized-db/core';
+import { EventSelection, EventType, isNull, ValidKey } from '@normalized-db/normalizer';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { BaseEvent } from '../base-event';
 import { OnDataChanged } from './on-data-changed';

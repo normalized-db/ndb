@@ -1,4 +1,4 @@
-import { ISchemaConfig } from '@normalized-db/core';
+import { ISchemaConfig } from '@normalized-db/normalizer';
 
 export const SCHEMA: ISchemaConfig = {
   _defaults: {

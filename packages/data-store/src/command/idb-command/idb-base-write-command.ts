@@ -1,4 +1,4 @@
-import { isNull, NdbDocument, NotFoundError, TypeMismatchError, ValidKey } from '@normalized-db/core';
+import { isNull, NdbDocument, NotFoundError, TypeMismatchError, ValidKey } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { CreatedEvent } from '../../event/created-event';
 import { UpdatedEvent } from '../../event/updated-event';

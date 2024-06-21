@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 
 export interface SingleItemQueryRunner<Result extends NdbDocument> {
 

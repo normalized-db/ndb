@@ -1,4 +1,4 @@
-import { NdbDocument, ValidKey } from '@normalized-db/core';
+import { NdbDocument, ValidKey } from '@normalized-db/normalizer';
 import { DataStoreTypes } from '../model/data-store-types';
 import { Parent } from '../model/parent';
 import { BaseEvent } from './base-event';

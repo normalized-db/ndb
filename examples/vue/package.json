@@ -9,9 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@normalized-db/core": "workspace:*",
     "@normalized-db/normalizer": "workspace:*",
-    "@normalized-db/denormalizer": "workspace:*",
     "@normalized-db/data-store": "workspace:*",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

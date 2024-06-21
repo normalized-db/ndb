@@ -1,4 +1,4 @@
-import { isNull } from '@normalized-db/core';
+import { isNull } from '@normalized-db/normalizer';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { ContextBuilder } from '../context.builder';
 import { IdbConfig } from './idb-config';

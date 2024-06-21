@@ -1,4 +1,4 @@
-import { NdbDocument, ValidKey } from '@normalized-db/core';
+import { NdbDocument, ValidKey } from '@normalized-db/normalizer';
 import { Context } from '../context/context';
 import { EventPipe } from '../event/utility/event-pipe';
 import { DataStoreTypes } from '../model/data-store-types';

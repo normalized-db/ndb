@@ -1,4 +1,4 @@
-import { isNull, NdbDocument } from '@normalized-db/core';
+import { isNull, NdbDocument } from '@normalized-db/normalizer';
 import { OrderByInvalidTypeError } from '../../error/order-by-invalid-type-error';
 import { OrderByTypeMismatchError } from '../../error/order-by-type-mismatch-error';
 import { ORDER_ASC } from './order';

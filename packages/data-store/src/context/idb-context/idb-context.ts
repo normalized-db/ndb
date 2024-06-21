@@ -1,6 +1,4 @@
-import { ISchema } from '@normalized-db/core';
-import { IDenormalizerBuilder } from '@normalized-db/denormalizer';
-import { INormalizerBuilder } from '@normalized-db/normalizer';
+import { IDenormalizerBuilder, INormalizerBuilder, ISchema } from '@normalized-db/normalizer';
 import { type IDBPDatabase, openDB } from 'idb';
 import { CommandFactory } from '../../command/command-factory';
 import { IdbCommandFactory } from '../../command/idb-command/idb-command-factory';

@@ -1,4 +1,4 @@
-import { Depth, isNull, NdbDocument, NotFoundError, RefsUtility, ValidKey } from '@normalized-db/core';
+import { Depth, isNull, NdbDocument, NotFoundError, RefsUtility, ValidKey } from '@normalized-db/normalizer';
 import { Context } from '../context/context';
 import { ChildNotFoundError } from '../error/child-not-found-error';
 import { RefNotFoundError } from '../error/ref-not-found-error';

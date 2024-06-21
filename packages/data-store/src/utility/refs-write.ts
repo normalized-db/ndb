@@ -1,4 +1,4 @@
-import { NdbDocument, ReverseReferences, ValidKey } from '@normalized-db/core';
+import { NdbDocument, ReverseReferences, ValidKey } from '@normalized-db/normalizer';
 import { Parent } from '../model/parent';
 
 export class RefsWriteUtility {

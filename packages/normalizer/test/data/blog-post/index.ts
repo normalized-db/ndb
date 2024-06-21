@@ -24,6 +24,7 @@ import {
   withRevRef,
 } from './data';
 import { SCHEMA } from './schema';
+import { SCHEMA_EXPANDED } from './schema-expanded';
 
 export {
   normalizeUser,
@@ -50,4 +51,5 @@ export {
   DATA_NORMALIZED,
   DATA_NORMALIZED_RR,
   SCHEMA,
+  SCHEMA_EXPANDED,
 };

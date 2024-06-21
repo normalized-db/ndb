@@ -1,4 +1,4 @@
-import { Depth, NdbDocument } from '@normalized-db/core';
+import { Depth, NdbDocument } from '@normalized-db/normalizer';
 import { Predicate } from '../model/predicate';
 import { BaseQuery } from './base-query';
 import { Filter } from './model/filter';

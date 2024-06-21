@@ -1,4 +1,4 @@
-import { isNull, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/core';
+import { isNull, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/normalizer';
 import { IDBPTransaction } from 'idb';
 import { ListResult, ListResultBuilder } from '../../list-result/index';
 import { IdbBaseQueryRunner } from './idb-base-query-runner';

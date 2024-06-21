@@ -1,4 +1,4 @@
-import { ValidKey } from '@normalized-db/core';
+import { ValidKey } from '@normalized-db/normalizer';
 import { BaseEvent } from '../../event/base-event';
 import { CreatedEvent } from '../../event/created-event';
 import { RemovedEvent } from '../../event/removed-event';

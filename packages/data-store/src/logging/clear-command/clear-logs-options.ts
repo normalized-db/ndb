@@ -1,4 +1,4 @@
-import { ValidKey } from '@normalized-db/core';
+import { ValidKey } from '@normalized-db/normalizer';
 import { BaseOptions } from '../../data-store/options/base-options';
 import { DataStoreTypes } from '../../model/data-store-types';
 

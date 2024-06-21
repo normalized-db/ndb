@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/normalized-db/data-store.git"
+    "url": "git+https://github.com/normalized-db/ndb.git"
   },
   "files": ["dist"],
   "main": "./dist/index.umd.js",
@@ -30,8 +30,6 @@
     "build": "pnpm cleanup && tsc -d && node build.mjs"
   },
   "dependencies": {
-    "@normalized-db/core": "workspace:*",
-    "@normalized-db/denormalizer": "workspace:*",
     "@normalized-db/normalizer": "workspace:*",
     "idb": "8.0.0"
   },

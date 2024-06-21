@@ -1,4 +1,4 @@
-import { IStoreLogConfig } from '@normalized-db/core';
+import { IStoreLogConfig } from '@normalized-db/normalizer';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { LogConfig } from './log-config';
 

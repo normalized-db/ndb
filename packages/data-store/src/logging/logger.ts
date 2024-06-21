@@ -1,4 +1,4 @@
-import { LogMode, SchemaLogConfig } from '@normalized-db/core';
+import { LogMode, SchemaLogConfig } from '@normalized-db/normalizer';
 import { Context } from '../context/context';
 import { BaseEvent } from '../event/base-event';
 import { EventPipe } from '../event/utility/event-pipe';

@@ -1,4 +1,4 @@
-import { isNull, MissingKeyError, NdbDocument, NotFoundError } from '@normalized-db/core';
+import { isNull, MissingKeyError, NdbDocument, NotFoundError } from '@normalized-db/normalizer';
 import { EmptyInputError } from '../../error/empty-input-error';
 import { UpdateCommand } from '../update-command';
 import { IdbBaseUpdateCommand } from './idb-base-update-command';

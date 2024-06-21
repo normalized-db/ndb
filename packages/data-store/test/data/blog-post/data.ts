@@ -1,4 +1,4 @@
-import { deepClone } from '@normalized-db/core';
+import { deepClone } from '@normalized-db/normalizer';
 
 export const normalizeUser = (user: any) => {
   const copy = deepClone(user);
@@ -30,7 +30,7 @@ export const normalizeAllPosts = (posts: any[]) => posts.map(normalizePost);
 export const withRevRef = (object: any, key: string, refs: IDBValidKey[], cloned = false) => {
   const result = cloned ? deepClone(object) : object;
   result._refs = { [key]: new Set(refs) };
-  
+
   return result;
 };
 

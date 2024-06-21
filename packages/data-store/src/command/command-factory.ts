@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { ClearCommand } from './clear-command';
 import { CreateCommand } from './create-command';
 import { PutCommand } from './put-command';

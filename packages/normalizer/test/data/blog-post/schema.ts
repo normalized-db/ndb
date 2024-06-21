@@ -1,21 +1,26 @@
-import { ISchemaConfig } from '@normalized-db/core';
+import { ISchemaConfig } from '../../../src/core';
 
 export const SCHEMA: ISchemaConfig = {
   _defaults: {
     key: 'id',
-    autoKey: true
+    autoKey: true,
   },
   _authored: {
     targets: {
-      author: 'user'
-    }
+      author: 'user',
+    },
   },
   role: true,
   user: {
     key: 'userName',
     targets: {
-      role: 'role'
-    }
+      role: 'role',
+    },
+    logging: {
+      mode: 'disabled',
+      eventSelection: 'created',
+      keys: [1, 2],
+    },
   },
   article: {
     parent: '_authored',
@@ -23,9 +28,18 @@ export const SCHEMA: ISchemaConfig = {
       comments: {
         type: 'comment',
         cascadeRemoval: true,
-        isArray: true
-      }
-    }
+        isArray: true,
+      },
+    },
+    logging: {
+      mode: 'full',
+      eventSelection: ['created', 'updated', 'removed'],
+    },
   },
-  comment: '_authored'
+  comment: {
+    parent: '_authored',
+    logging: {
+      mode: 'simple',
+    },
+  },
 };

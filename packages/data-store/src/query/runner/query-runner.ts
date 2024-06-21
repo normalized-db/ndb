@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { ListResult } from '../list-result/list-result';
 
 export interface QueryRunner<Result extends NdbDocument> {

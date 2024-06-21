@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { Predicate } from '../../model/predicate';
 
 export class Filter<DbItem extends NdbDocument> {

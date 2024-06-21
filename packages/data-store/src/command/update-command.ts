@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { Command } from './command';
 
 export interface UpdateCommand<T extends NdbDocument> extends Command<T | T[]> {

@@ -1,4 +1,4 @@
-import { isNull, MissingKeyError, NdbDocument } from '@normalized-db/core';
+import { isNull, MissingKeyError, NdbDocument } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { EmptyInputError } from '../../error/empty-input-error';
 import { Parent } from '../../model/parent';

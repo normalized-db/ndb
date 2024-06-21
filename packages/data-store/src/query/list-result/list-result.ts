@@ -1,4 +1,4 @@
-import { isNull, NdbDocument } from '@normalized-db/core';
+import { isNull, NdbDocument } from '@normalized-db/normalizer';
 
 export class ListResult<DbItem extends NdbDocument> {
 

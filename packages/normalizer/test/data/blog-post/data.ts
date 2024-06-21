@@ -1,4 +1,4 @@
-import { deepClone } from '@normalized-db/core';
+import { deepClone } from '../../../src/core';
 
 export const normalizeUser = (user: any) => {
   const copy = deepClone(user);
@@ -30,23 +30,23 @@ export const normalizeAllPosts = (posts: any[]) => posts.map(normalizePost);
 export const withRevRef = (object: any, key: string, refs: IDBValidKey[], cloned = false) => {
   const result = cloned ? deepClone(object) : object;
   result._refs = { [key]: new Set(refs) };
-  
+
   return result;
 };
 
 export const ROLE1 = {
   id: 1,
-  label: 'Subscriber'
+  label: 'Subscriber',
 };
 
 export const ROLE2 = {
   id: 2,
-  label: 'Journalist'
+  label: 'Journalist',
 };
 
 export const ROLE3 = {
   id: 3,
-  label: 'Freelancer'
+  label: 'Freelancer',
 };
 
 export const USER_ALEXK = {
@@ -54,7 +54,7 @@ export const USER_ALEXK = {
   firstName: 'Alexandra',
   lastName: 'König',
   email: 'alex.koenig@domain.at',
-  role: ROLE1
+  role: ROLE1,
 };
 
 export const USER_MMUSTER = {
@@ -62,7 +62,7 @@ export const USER_MMUSTER = {
   firstName: 'Max',
   lastName: 'Mustermann',
   email: 'mmuster@newspaper.at',
-  role: ROLE2
+  role: ROLE2,
 };
 
 export const USER_PLUSTIG = {
@@ -70,7 +70,7 @@ export const USER_PLUSTIG = {
   firstName: 'Petra',
   lastName: 'Lustig',
   email: 'office@lustig-news.at',
-  role: ROLE3
+  role: ROLE3,
 };
 
 export const USER_TIMLER42 = {
@@ -78,7 +78,7 @@ export const USER_TIMLER42 = {
   firstName: 'Tim',
   lastName: 'Müller',
   email: 'timmueller@mail.com',
-  role: ROLE1
+  role: ROLE1,
 };
 
 export const COMMENT1 = {
@@ -87,9 +87,9 @@ export const COMMENT1 = {
   createdDate: {
     date: '2017-07-05 10:14:13.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
-  author: USER_TIMLER42
+  author: USER_TIMLER42,
 };
 
 export const COMMENT2 = {
@@ -98,9 +98,9 @@ export const COMMENT2 = {
   createdDate: {
     date: '2017-07-05 10:38:03.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
-  author: USER_ALEXK
+  author: USER_ALEXK,
 };
 
 export const COMMENT3 = {
@@ -109,9 +109,9 @@ export const COMMENT3 = {
   createdDate: {
     date: '2017-07-07 14:01:31.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
-  author: USER_ALEXK
+  author: USER_ALEXK,
 };
 
 export const POST1 = {
@@ -121,13 +121,13 @@ export const POST1 = {
   createdDate: {
     date: '2017-07-05 09:08:22.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
   author: USER_MMUSTER,
   comments: [
     COMMENT1,
-    COMMENT2
-  ]
+    COMMENT2,
+  ],
 };
 
 export const POST2 = {
@@ -137,10 +137,10 @@ export const POST2 = {
   createdDate: {
     date: '2017-07-07 14:01:31.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
   author: USER_PLUSTIG,
-  comments: [COMMENT3]
+  comments: [COMMENT3],
 };
 
 export const POST3 = {
@@ -150,9 +150,9 @@ export const POST3 = {
   createdDate: {
     date: '2017-07-07 16:45:01.000000',
     timezone_type: 3,
-    timezone: 'Europe/Berlin'
+    timezone: 'Europe/Berlin',
   },
-  author: USER_MMUSTER
+  author: USER_MMUSTER,
 };
 
 export const DATA = [POST1, POST2, POST3];
@@ -161,7 +161,7 @@ export const DATA_NORMALIZED = {
   role: [ROLE2, ROLE1, ROLE3],
   user: normalizeAllUsers([USER_MMUSTER, USER_TIMLER42, USER_ALEXK, USER_PLUSTIG]),
   article: normalizeAllPosts([POST1, POST2, POST3]),
-  comment: normalizeAllComments([COMMENT1, COMMENT2, COMMENT3])
+  comment: normalizeAllComments([COMMENT1, COMMENT2, COMMENT3]),
 };
 
 export const DATA_NORMALIZED_RR = deepClone(DATA_NORMALIZED);

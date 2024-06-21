@@ -1,6 +1,4 @@
-import { ISchema, UniqueKeyCallback, ValidKey } from '@normalized-db/core';
-import { IDenormalizerBuilder } from '@normalized-db/denormalizer';
-import { INormalizer, INormalizerBuilder } from '@normalized-db/normalizer';
+import { IDenormalizerBuilder, INormalizer, INormalizerBuilder, ISchema, UniqueKeyCallback, ValidKey } from '@normalized-db/normalizer';
 import { CommandFactory } from '../command/command-factory';
 import { EventPipe } from '../event/utility/event-pipe';
 import { Logger } from '../logging/logger';

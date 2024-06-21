@@ -3,14 +3,14 @@
   "version": "3.0.0",
   "author": "Sandro Schleu",
   "license": "MIT",
-  "description": "Normalize `JavaScript` objects based on a simple schema (implemented with `TypeScript`).",
+  "description": "Normalize and restore `JavaScript` objects based on a simple schema.",
   "keywords": [
     "JavaScript",
     "Normalization"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/normalized-db/normalizer.git"
+    "url": "git+https://github.com/normalized-db/ndb.git"
   },
   "files": ["dist"],
   "main": "./dist/index.umd.js",
@@ -28,9 +28,6 @@
     "cleanup": "rm -rf dist",
     "build": "pnpm cleanup && tsc -d && node build.mjs",
     "test": "jest"
-  },
-  "dependencies": {
-    "@normalized-db/core": "workspace:*"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

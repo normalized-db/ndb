@@ -1,4 +1,4 @@
-import { NdbDocument, ValidKey } from '@normalized-db/core';
+import { NdbDocument, ValidKey } from '@normalized-db/normalizer';
 import { Command } from './command';
 
 export interface RemoveCommand<T extends NdbDocument> extends Command<T | ValidKey> {

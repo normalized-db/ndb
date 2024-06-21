@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { IdbContext } from '../../../context/idb-context/index';
 import { InvalidQueryRunnerStatusError } from '../../../error/index';
 import { ListResult } from '../../list-result/index';

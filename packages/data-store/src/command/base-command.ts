@@ -1,7 +1,14 @@
 import {
-  InvalidTypeError, ISchema, isNull, IStore, IStoreConfig, MissingKeyError, NdbDocument, NormalizedData,
-  ValidKey
-} from '@normalized-db/core';
+  InvalidTypeError,
+  ISchema,
+  isNull,
+  IStore,
+  IStoreConfig,
+  MissingKeyError,
+  NdbDocument,
+  NormalizedData,
+  ValidKey,
+} from '@normalized-db/normalizer';
 import { Context } from '../context/context';
 import { EventQueue } from '../event/utility/event-queue';
 import { Command } from './command';

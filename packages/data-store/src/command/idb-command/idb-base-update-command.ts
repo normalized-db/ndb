@@ -1,4 +1,4 @@
-import { isNull, NdbDocument, NotFoundError } from '@normalized-db/core';
+import { isNull, NdbDocument, NotFoundError } from '@normalized-db/normalizer';
 import { IDBPObjectStore } from 'idb';
 import { IdbBaseWriteCommand } from './idb-base-write-command';
 

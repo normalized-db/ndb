@@ -4,13 +4,11 @@
     // Building
     "outDir": "./dist",
     "baseUrl": "./",
-    "target": "ESNext",
+    "target": "ES2020",
     "moduleResolution": "node",
-//    "module": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "esModuleInterop": true,
-    //    "useDefineForClassFields": true,
     // Emit
     "declaration": true,
     "sourceMap": true,

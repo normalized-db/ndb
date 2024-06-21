@@ -1,7 +1,6 @@
-import { isNull } from '@normalized-db/core';
+import { isNull } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { DataStoreTypes } from '../../model/data-store-types';
-import type { IdbWriteStore } from '../../utility/idb';
 import { ClearLogsCommand } from '../clear-command/clear-logs-command';
 import { ClearLogsOptions } from '../clear-command/clear-logs-options';
 import { LogEntry } from '../model/log-entry';

@@ -1,4 +1,4 @@
-import { isNull, MissingKeyError, NotFoundError, ValidKey } from '@normalized-db/core';
+import { isNull, MissingKeyError, NotFoundError, ValidKey } from '@normalized-db/normalizer';
 import { EmptyInputError } from '../../error/empty-input-error';
 import { SetCommand } from '../set-command';
 import { IdbBaseUpdateCommand } from './idb-base-update-command';

@@ -1,4 +1,4 @@
-import { Depth, NdbDocument, RefsUtility, ValidKey } from '@normalized-db/core';
+import { Depth, NdbDocument, RefsUtility, ValidKey } from '@normalized-db/normalizer';
 import { EmptyResultError } from '../error/empty-result-error';
 import { Parent } from '../model/parent';
 import { Predicate } from '../model/predicate';

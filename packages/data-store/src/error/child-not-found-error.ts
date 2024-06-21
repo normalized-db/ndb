@@ -1,4 +1,4 @@
-import { isNull, ValidKey } from '@normalized-db/core';
+import { isNull, ValidKey } from '@normalized-db/normalizer';
 import { Parent } from '../model/parent';
 
 export class ChildNotFoundError extends Error {

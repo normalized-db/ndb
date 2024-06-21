@@ -1,4 +1,4 @@
-import { ValidKey } from '@normalized-db/core';
+import { ValidKey } from '@normalized-db/normalizer';
 import { Context } from '../../context/context';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { Parent } from '../../model/parent';

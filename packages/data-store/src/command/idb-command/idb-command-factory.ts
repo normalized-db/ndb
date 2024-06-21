@@ -1,4 +1,4 @@
-import { NdbDocument } from '@normalized-db/core';
+import { NdbDocument } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { ClearCommand } from '../clear-command';
 import { CommandFactory } from '../command-factory';

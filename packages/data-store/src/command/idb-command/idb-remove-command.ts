@@ -1,4 +1,4 @@
-import { isNull, IStore, IStoreTarget, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/core';
+import { isNull, IStore, IStoreTarget, NdbDocument, NotFoundError, ValidKey } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { EmptyInputError } from '../../error/empty-input-error';
 import { RemovedEvent } from '../../event/removed-event';

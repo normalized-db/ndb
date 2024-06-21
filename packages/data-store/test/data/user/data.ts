@@ -1,4 +1,4 @@
-import { deepClone } from '@normalized-db/core';
+import { deepClone } from '@normalized-db/normalizer';
 
 export const normalize = user => {
   const copy = deepClone(user);

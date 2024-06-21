@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import { deepClone, ISchemaConfig, ValidKey } from '@normalized-db/core';
-import { INormalizer, NormalizerBuilder } from '../src';
+import { deepClone, ISchemaConfig, ValidKey } from '../src/core';
+import { INormalizer, NormalizerBuilder } from '../src/normalizer';
 import * as Blog from './data/blog-post';
 import * as User from './data/user';
 

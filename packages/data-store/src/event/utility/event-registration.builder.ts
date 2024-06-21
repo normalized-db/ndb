@@ -1,4 +1,4 @@
-import { EventSelection, ValidKey } from '@normalized-db/core';
+import { EventSelection, ValidKey } from '@normalized-db/normalizer';
 import { ListenerRegisteredError } from '../../error/listener-registered-error';
 import { DataStoreTypes } from '../../model/data-store-types';
 import { EventRegistration } from './event-registration';

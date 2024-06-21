@@ -1,5 +1,4 @@
-import { ISchema, ValidKey } from '@normalized-db/core';
-import { IDenormalizer } from '@normalized-db/denormalizer';
+import { IDenormalizer, ISchema, ValidKey } from '@normalized-db/normalizer';
 import { IdbContext } from '../../../context/idb-context/index';
 import { InvalidQueryRunnerStatusError } from '../../../error/index';
 import { QueryConfig } from '../../model/query-config';

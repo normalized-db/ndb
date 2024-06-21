@@ -1,12 +1,4 @@
-import {
-  EventType,
-  ILogConfig,
-  isNull,
-  IStoreLogConfig,
-  LogMode,
-  StoreLogBuilder,
-  ValidKey
-} from '@normalized-db/core';
+import { EventType, ILogConfig, isNull, IStoreLogConfig, LogMode, StoreLogBuilder, ValidKey } from '@normalized-db/normalizer';
 import { DataStoreTypes } from '../../model/data-store-types';
 
 export class LogConfig<Types extends DataStoreTypes> implements ILogConfig {

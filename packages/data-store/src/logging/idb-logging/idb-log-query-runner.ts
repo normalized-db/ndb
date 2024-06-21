@@ -1,4 +1,4 @@
-import { isNull } from '@normalized-db/core';
+import { isNull } from '@normalized-db/normalizer';
 import { IdbContext } from '../../context/idb-context/idb-context';
 import { InvalidQueryRunnerStatusError } from '../../error/index';
 import { DataStoreTypes } from '../../model/data-store-types';

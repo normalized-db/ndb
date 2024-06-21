@@ -1,6 +1,4 @@
-import { ISchema, ISchemaConfig, isNull, Schema } from '@normalized-db/core';
-import { IDenormalizerBuilder } from '@normalized-db/denormalizer';
-import { INormalizerBuilder } from '@normalized-db/normalizer';
+import { IDenormalizerBuilder, INormalizerBuilder, ISchema, ISchemaConfig, isNull, Schema } from '@normalized-db/normalizer';
 import { LogConfig } from '../logging/config/log-config';
 import { DataStoreTypes } from '../model/data-store-types';
 import { Context } from './context';
