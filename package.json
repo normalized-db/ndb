@@ -21,7 +21,7 @@
     "lint": "pnpm --filter \"@normalized-db/*\" lint",
     "build": "pnpm --filter \"@normalized-db/*\" build",
     "cleanup": "pnpm --filter \"@normalized-db/*\" cleanup",
-    "test": "pnpm cleanup && jest",
+    "test": "jest",
     "bundle": "pnpm run lint && pnpm run build"
   },
   "dependencies": {
