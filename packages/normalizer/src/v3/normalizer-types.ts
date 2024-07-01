@@ -1,5 +1,5 @@
-import { Depth, FetchCallback, IStoreLogConfig, type ReverseReferences, type UniqueKeyCallback, ValidKey } from '../core';
-import type { KeyTypes, ObjectKey, SchemaStructure } from './normalizer-config-types';
+import type { KeyTypes, ObjectKey, SchemaStructure, StoreLogConfig } from './normalizer-config-types';
+import type { FlattenArray } from './utils-types';
 
 export type NormalizedDb<DataTypes extends SchemaStructure> = {
   schema: Schema<DataTypes>;
@@ -18,7 +18,7 @@ export type Entity<
   key: ObjectKey<DataTypes[EntityKey], KeyTypes>;
   targets: EntityTargets<DataTypes, EntityKey>;
   autoKey: boolean;
-  logging: IStoreLogConfig;
+  logging: StoreLogConfig;
 };
 
 export type EntityTargets<
@@ -34,19 +34,42 @@ export type EntityProperty<DataTypes extends SchemaStructure> = {
   cascadeRemoval: boolean;
 };
 
-export type KeyMap<DataTypes extends SchemaStructure> = {
-  [EntityKey in keyof DataTypes]?: Map<ValidKey, number>;
-};
-
 export type NormalizedData<DataTypes extends SchemaStructure> = {
-  [EntityKey in keyof DataTypes]?: (DataTypes[EntityKey] & { _refs?: ReverseReferences })[]
-} | {
-  _keyMap: KeyMap<DataTypes>,
+  keyMap: KeyMap<DataTypes>,
+  tree: NormalizedDataTree<DataTypes>,
+  entities: NormalizedEntities<DataTypes>,
 };
 
-export type NormalizeOptions = {
+export type KeyMap<DataTypes extends SchemaStructure> = {
+  [EntityKey in keyof DataTypes]?: Map<KeyTypes, number>;
+};
+
+export type NormalizedDataTree<DataTypes extends SchemaStructure> = {
+  [EntityKey in keyof DataTypes]?: EntityTree<DataTypes, EntityKey>
+};
+
+export type EntityTree<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> =
+  Map<KeyTypes, Map<keyof DataTypes[EntityKey], KeyTypes | KeyTypes[]>>;
+
+export type NormalizedEntities<DataTypes extends SchemaStructure> = {
+  [EntityKey in keyof DataTypes]?: NormalizedItem<DataTypes, EntityKey>[]
+};
+
+export type NormalizedItem<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> =
+  DataTypes[EntityKey] & { _refs?: ReverseReferences<DataTypes> };
+
+export type ReverseReferences<DataTypes extends SchemaStructure> = {
+  [type in keyof DataTypes]?: Set<KeyTypes>;
+};
+
+export type UniqueKeyCallback<DataTypes extends SchemaStructure> = <
+  EntityKey extends keyof DataTypes,
+  T extends DataTypes[EntityKey]
+> (type: EntityKey) => T[EntityKey];
+
+export type NormalizeOptions<DataTypes extends SchemaStructure> = {
   reverseRefs?: boolean,
-  uniqueKeyCallback?: UniqueKeyCallback | undefined,
+  uniqueKeyCallback?: UniqueKeyCallback<DataTypes>,
 };
 
 export type NormalizeFunction<DataTypes extends SchemaStructure> = <
@@ -55,13 +78,27 @@ export type NormalizeFunction<DataTypes extends SchemaStructure> = <
 >(
   type: EntityKey,
   data: T | T[],
-  options?: NormalizeOptions,
-) => Promise<NormalizedData<DataTypes>>;
+  options?: NormalizeOptions<DataTypes>,
+) => NormalizedData<DataTypes>;
 
-export type DenormalizerFactoryOptions = {
-  fetchCallback?: FetchCallback,
-    depth?: number | Depth,
-    reverseRefsDeleted?: boolean,
+export type Depth<EntityType = any> = number | {
+  [Target in keyof EntityType]?: FlattenArray<Depth<EntityType[Target]>>;
+};
+
+export type FetchCallback<
+  DataTypes extends SchemaStructure,
+  EntityKey extends keyof DataTypes,
+  T extends DataTypes[EntityKey],
+> = (type: EntityKey, key: KeyTypes) => T | Promise<T>;
+
+export type DenormalizerFactoryOptions<
+  DataTypes extends SchemaStructure,
+  EntityKey extends keyof DataTypes,
+  T extends DataTypes[EntityKey]
+> = {
+  fetchCallback?: FetchCallback<DataTypes, EntityKey, T>,
+  depth?: Depth<T>,
+  reverseRefsDeleted?: boolean,
 };
 
 export type DenormalizerFactory<
@@ -73,10 +110,15 @@ export type DenormalizerFactory<
 >(
   normalizedData: NormalizedData<DataTypes>,
   type: EntityKey,
-  options?: DenormalizerFactoryOptions,
+  options?: DenormalizerFactoryOptions<DataTypes, EntityKey, T>,
 ) => {
-  fromArray: (data: T[]) => Promise<T[]>,
-  fromData: (data: T) => Promise<T>,
-  fromKeys: (keys: T[KeyPath][]) => Promise<T[]>,
-  fromKey: (key: T[KeyPath]) => Promise<T>,
+  fromKey: (key: T[KeyPath]) => T,
+  fromKeys: (keys: T[KeyPath][]) => T[],
+  fromData: (data: T) => T,
+  fromArray: (data: T[]) => T[],
 };
+
+export type ParentRef<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes, Key extends KeyTypes> = {
+  type: EntityKey,
+  key: Key,
+} | undefined;

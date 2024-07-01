@@ -1,4 +1,10 @@
-import type { AbstractSchemaStructure, PropertiesConfig, SchemaConfig, SchemaStructure } from './normalizer-config-types';
+import {
+  LogMode,
+  type AbstractSchemaStructure,
+  type PropertiesConfig,
+  type SchemaConfig,
+  type SchemaStructure,
+} from './normalizer-config-types';
 import type { Entity, Schema } from './normalizer-types';
 
 const defaultsKey: keyof SchemaConfig<unknown, unknown> = '@defaults';
@@ -41,7 +47,7 @@ function buildType<
   let keyPath = parent?.key;
   let targets = parent?.targets ?? {};
   let autoKey = parent?.autoKey ?? false;
-  let logging = parent?.logging ?? { mode: 'disabled' };
+  let logging = parent?.logging ?? { mode: LogMode.Disabled };
   if (typeof entity === 'object') {
     if (entity.key) {
       keyPath = entity.key;

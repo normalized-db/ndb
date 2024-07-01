@@ -1,5 +1,3 @@
-import { IStoreLogConfig } from '../core';
-
 export type NormalizableObject = InstanceType<any>;
 export type SchemaStructure = Record<string, NormalizableObject>;
 export type AbstractSchemaStructure = Record<string, NormalizableObject>;
@@ -46,7 +44,7 @@ export type EntityConfig<
   targets?: PropertiesConfig<DataTypes, EntityKey>;
   dataStore?: {
     autoKey?: boolean;
-    logging?: IStoreLogConfig;
+    logging?: StoreLogConfig;
   }
 };
 
@@ -64,3 +62,17 @@ export type PropertyConfig<DataTypes extends SchemaStructure> = {
     cascadeRemoval?: boolean;
   }
 };
+
+export type StoreLogConfig = {
+  mode: LogMode;
+  eventSelection?: EventSelection;
+};
+
+export type EventType = 'created' | 'updated' | 'removed' | 'cleared';
+export type EventSelection = EventType | EventType[];
+
+export const enum LogMode {
+  Disabled = 'Disabled', // no logging
+  Simple = 'simple', // `LogEntry<?>` except `item`-field
+  Full = 'full', // include `item`-field
+}
