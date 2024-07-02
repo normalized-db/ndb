@@ -23,7 +23,7 @@ export type SchemaConfig<
   },
 };
 
-export type EntityTypeReference<DataTypes extends SchemaStructure> = keyof DataTypes;
+export type EntityTypeReference<DataTypes extends SchemaStructure> = keyof DataTypes & string;
 
 type AbstractEntityKey<AbstractDataTypes extends AbstractSchemaStructure> = {
   [EntityKey in keyof AbstractDataTypes as `@${EntityKey & string}`]: AbstractDataTypes[EntityKey]

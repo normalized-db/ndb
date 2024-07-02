@@ -1,21 +1,21 @@
 import {
-  LogMode,
   type AbstractSchemaStructure,
+  LogMode,
   type PropertiesConfig,
   type SchemaConfig,
   type SchemaStructure,
 } from './normalizer-config-types';
-import type { Entity, Schema } from './normalizer-types';
+import type { Entity, EntityProperty, Schema } from './normalizer-types';
 
-const defaultsKey: keyof SchemaConfig<unknown, unknown> = '@defaults';
+const defaultsKey: keyof SchemaConfig<any, any> = '@defaults';
 
 export function buildSchema<DataTypes extends SchemaStructure, AbstractDataTypes extends AbstractSchemaStructure = {}>(
   config: SchemaConfig<DataTypes, AbstractDataTypes>,
 ): Schema<DataTypes> {
-  const schema = {};
+  const schema: Partial<Schema<DataTypes>> = {};
   for (const key of Object.keys(config)) {
     if (key.charAt(0) !== '@') {
-      schema[key] = buildType(config, key);
+      schema[key as keyof DataTypes] = buildType(config, key);
     }
   }
 
@@ -41,7 +41,7 @@ function buildType<
     : parentEntityKey
       ? buildType(schemaConfig, parentEntityKey)
       : defaultsKey in schemaConfig
-        ? buildType(schemaConfig, defaultsKey)
+        ? buildType(schemaConfig, String(defaultsKey))
         : undefined;
 
   let keyPath = parent?.key;
@@ -85,8 +85,12 @@ function buildTargets<
   DataTypes extends SchemaStructure,
   EntityKey extends keyof DataTypes
 >(targets: PropertiesConfig<DataTypes, EntityKey>) {
-  const entityTargets = {};
+  const entityTargets: Record<string, EntityProperty<DataTypes>> = {};
   for (const [propKey, propConfig] of Object.entries(targets)) {
+    if (!propConfig) {
+      throw new Error(`Target ${propKey} is missing its configuration`);
+    }
+
     entityTargets[propKey] = typeof propConfig === 'object'
       ? {
         type: propConfig.type,

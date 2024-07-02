@@ -15,7 +15,7 @@ describe('v3/Denormalize', function () {
 
   const { denormalizer } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
 
-  it('Role', async function () {
+  it('Role', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
       keyMap: { role: new Map([['admin', 0], ['standard', 1]]) },
       tree: {},
@@ -26,17 +26,16 @@ describe('v3/Denormalize', function () {
         ],
       },
     };
-    const typedDenormalizer = denormalizer(normalizedData, 'role');
-    const actual1 = await typedDenormalizer.fromData({ id: 'admin', name: 'Admin' });
-    const actual2 = await typedDenormalizer.fromKey('admin');
-    const actual3 = await typedDenormalizer.fromKey('standard');
+
+    const typedDenormalizer = denormalizer.fromData(normalizedData).ofType('role');
+    const actual1 = typedDenormalizer.fromKey('admin');
+    const actual2 = typedDenormalizer.fromKey('standard');
 
     expect(actual1).toEqual(MockData.roleAdmin);
-    expect(actual2).toEqual(MockData.roleAdmin);
-    expect(actual3).toEqual(MockData.roleUser);
+    expect(actual2).toEqual(MockData.roleUser);
   });
 
-  it('User', async function () {
+  it('User', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
       keyMap: {
         role: new Map([['admin', 0], ['standard', 1]]),
@@ -54,9 +53,10 @@ describe('v3/Denormalize', function () {
         ],
       },
     };
-    const typedDenormalizer = denormalizer(normalizedData, 'user', { reverseRefsDeleted: true });
-    const actual1 = await typedDenormalizer.fromKey('user1');
-    const actual2 = await typedDenormalizer.fromKey('user2');
+
+    const [actual1, actual2] = denormalizer.fromData(normalizedData)
+      .ofType('user', { reverseRefsDeleted: true })
+      .fromKeys(['user1', 'user2']);
 
     expect(actual1).toEqual(MockData.user1);
     expect(actual2).toEqual(MockData.user2);
@@ -98,21 +98,19 @@ describe('v3/Denormalize', function () {
       },
     };
 
-    it('Blog post', async function () {
-      const typedDenormalizer = denormalizer(normalizedData, 'blogPost', { reverseRefsDeleted: true });
-      const actual1 = await typedDenormalizer.fromKey(1);
-
+    it('Blog post', function () {
+      const actual1 = denormalizer.fromData(normalizedData)
+        .ofType('blogPost', { reverseRefsDeleted: true })
+        .fromKey(1);
       expect(actual1).toEqual(MockData.blogPost1);
     });
 
-    it('Blog post with numeric depth', async function () {
-      const typedDenormalizer = denormalizer(normalizedData, 'blogPost', {
-        reverseRefsDeleted: true,
-        depth: 1,
-      });
-      const actual1 = await typedDenormalizer.fromKey(1);
+    it('Blog post with numeric depth', function () {
+      const actual = denormalizer.fromData(normalizedData)
+        .ofType('blogPost', { reverseRefsDeleted: true, depth: 1 })
+        .fromKey(1);
 
-      expect(actual1).toEqual({
+      expect(actual).toEqual({
         id: 1,
         title: 'Post 1',
         author: { ...MockData.user1, role: MockData.user1.role.id },
@@ -123,17 +121,18 @@ describe('v3/Denormalize', function () {
       });
     });
 
-    it('Blog post with property-specific depth', async function () {
-      const typedDenormalizer = denormalizer(normalizedData, 'blogPost', {
-        reverseRefsDeleted: true,
-        depth: {
-          author: 2,
-          comments: { author: 0 },
-        },
-      });
-      const actual1 = await typedDenormalizer.fromKey(1);
+    it('Blog post with property-specific depth', function () {
+      const actual = denormalizer.fromData(normalizedData)
+        .ofType('blogPost', {
+          reverseRefsDeleted: true,
+          depth: {
+            author: 2,
+            comments: { author: 0 },
+          },
+        })
+        .fromKey(1);
 
-      expect(actual1).toEqual({
+      expect(actual).toEqual({
         id: 1,
         title: 'Post 1',
         author: MockData.user1,

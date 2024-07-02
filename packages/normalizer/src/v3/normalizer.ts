@@ -63,41 +63,52 @@ export function normalizer<DataTypes extends SchemaStructure>(
         };
       }
 
+      // log entity in tree
+      const tree = normalizedResult.tree[type];
+      if (!tree) {
+        normalizedResult.tree[type] = new Map([[key, undefined]]);
+      } else {
+        tree.set(key, undefined);
+      }
+
       // extract nested objects and arrays
       const ref: ParentRef<DataTypes, any, any> = { type, key };
       for (const [nestedProperty, target] of Object.entries(targets)) {
-        const value = item[nestedProperty];
-        if (value === undefined || value === null) {
+        if (!target) {
+          throw new Error(`${String(type)}.${nestedProperty} has undefined target`);
+        }
+
+        const nestedValue = item[nestedProperty];
+        if (nestedValue === undefined || nestedValue === null) {
           continue;
-        } else if (target.isArray && !Array.isArray(value)) {
-          throw new Error(`${parent.type}[${parent.key}].${nestedProperty} expected nested array but was ${typeof value}`);
-        } else if (!target.isArray && Array.isArray(value)) {
-          throw new Error(`${parent.type}[${parent.key}].${nestedProperty} expected nested object but was array`);
+        } else if (target.isArray && !Array.isArray(nestedValue)) {
+          throw new Error(`${ref.type}[${ref.key}].${nestedProperty} expected nested array but was ${typeof nestedValue}`);
+        } else if (!target.isArray && Array.isArray(nestedValue)) {
+          throw new Error(`${ref.type}[${ref.key}].${nestedProperty} expected nested object but was array`);
         }
 
         // log reference in tree of output structure
-        const targetRef = apply(ref, target.type, value);
+        const targetRef = apply(ref, target.type, nestedValue);
         normalizedItem[nestedProperty] = targetRef;
-        const tree = normalizedResult.tree[type];
-        if (!tree) {
-          normalizedResult.tree[type] = new Map([[key, new Map([[nestedProperty, targetRef]])]]);
-        } else {
-          const entityTree = tree.get(key);
+        if (targetRef !== undefined) {
+          const distinctTargetRefs = Array.isArray(targetRef) ? new Set(targetRef) : targetRef;
+          const tree = normalizedResult.tree[type];
+          const entityTree = tree!.get(key);
           if (!entityTree) {
-            tree.set(key, new Map([[nestedProperty, targetRef]]));
+            tree!.set(key, new Map([[nestedProperty, distinctTargetRefs]]));
           } else {
-            entityTree.set(nestedProperty, targetRef);
+            entityTree.set(nestedProperty, distinctTargetRefs);
           }
         }
       }
 
-      // add to output structure
+      // add to output
       const normalizedItemsOfType = normalizedResult.entities[type];
       if (!normalizedItemsOfType) {
         normalizedResult.keyMap[type] = new Map([[key, 0]]);
         normalizedResult.entities[type] = [normalizedItem];
       } else {
-        const keyMapOfType = normalizedResult.keyMap[type];
+        const keyMapOfType = normalizedResult.keyMap[type]!;
         const existingIndex = keyMapOfType.get(key);
         if (existingIndex === undefined) {
           keyMapOfType.set(key, normalizedItemsOfType.length);

@@ -1,8 +1,9 @@
-import { denormalizer } from './denormalizer';
+import { denormalizerFactory } from './denormalizer';
 import { normalizer } from './normalizer';
 import type { AbstractSchemaStructure, SchemaConfig, SchemaStructure } from './normalizer-config-types';
 import type { DenormalizerFactoryOptions, NormalizedDb, NormalizeOptions } from './normalizer-types';
 import { buildSchema } from './schema';
+import { buildState } from './state';
 
 export function normalizedDb<DataTypes extends SchemaStructure, AbstractDataTypes extends AbstractSchemaStructure = {}>(
   config: SchemaConfig<DataTypes, AbstractDataTypes>,
@@ -12,10 +13,12 @@ export function normalizedDb<DataTypes extends SchemaStructure, AbstractDataType
   } = {},
 ): NormalizedDb<DataTypes> {
   const schema = buildSchema(config);
+  const state = buildState(schema);
 
   return {
     schema,
+    state,
     normalize: normalizer(schema, globalOptions.normalize),
-    denormalizer: denormalizer(schema, globalOptions.denormalize),
+    denormalizer: denormalizerFactory(schema, globalOptions.denormalize),
   };
 }

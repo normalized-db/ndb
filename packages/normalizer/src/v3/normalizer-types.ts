@@ -3,6 +3,7 @@ import type { FlattenArray } from './utils-types';
 
 export type NormalizedDb<DataTypes extends SchemaStructure> = {
   schema: Schema<DataTypes>;
+  state: StateFunction<DataTypes>;
   normalize: NormalizeFunction<DataTypes>;
   denormalizer: DenormalizerFactory<DataTypes>;
 };
@@ -34,6 +35,19 @@ export type EntityProperty<DataTypes extends SchemaStructure> = {
   cascadeRemoval: boolean;
 };
 
+export type StateFunction<DataTypes extends SchemaStructure> = {
+  mergeTrees: (tree1: NormalizedDataTree<DataTypes>, tree2: NormalizedDataTree<DataTypes>) => NormalizedDataTree<DataTypes>,
+  findEntityKeys: <
+    EntityType extends keyof DataTypes,
+    KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
+    Key extends DataTypes[EntityType][KeyPath],
+  >(
+    tree: NormalizedDataTree<DataTypes>,
+    rootType: EntityType,
+    rootKeys?: Key | Key[],
+  ) => PreloadEntities<DataTypes>,
+};
+
 export type NormalizedData<DataTypes extends SchemaStructure> = {
   keyMap: KeyMap<DataTypes>,
   tree: NormalizedDataTree<DataTypes>,
@@ -49,7 +63,7 @@ export type NormalizedDataTree<DataTypes extends SchemaStructure> = {
 };
 
 export type EntityTree<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> =
-  Map<KeyTypes, Map<keyof DataTypes[EntityKey], KeyTypes | KeyTypes[]>>;
+  Map<KeyTypes, undefined | Map<keyof DataTypes[EntityKey], KeyTypes | Set<KeyTypes>>>;
 
 export type NormalizedEntities<DataTypes extends SchemaStructure> = {
   [EntityKey in keyof DataTypes]?: NormalizedItem<DataTypes, EntityKey>[]
@@ -85,40 +99,46 @@ export type Depth<EntityType = any> = number | {
   [Target in keyof EntityType]?: FlattenArray<Depth<EntityType[Target]>>;
 };
 
-export type FetchCallback<
-  DataTypes extends SchemaStructure,
-  EntityKey extends keyof DataTypes,
-  T extends DataTypes[EntityKey],
-> = (type: EntityKey, key: KeyTypes) => T | Promise<T>;
-
 export type DenormalizerFactoryOptions<
   DataTypes extends SchemaStructure,
   EntityKey extends keyof DataTypes,
   T extends DataTypes[EntityKey]
 > = {
-  fetchCallback?: FetchCallback<DataTypes, EntityKey, T>,
   depth?: Depth<T>,
   reverseRefsDeleted?: boolean,
 };
 
 export type DenormalizerFactory<
   DataTypes extends SchemaStructure
+> = {
+  preload: (
+    tree: NormalizedDataTree<DataTypes>,
+    entities: PreloadEntities<DataTypes>,
+    load: <
+      EntityKey extends keyof DataTypes,
+      KeyPath extends ObjectKey<DataTypes[EntityKey], KeyTypes>,
+    >(type: EntityKey, keys: DataTypes[EntityKey][KeyPath][]) => Promise<DataTypes[EntityKey][]>,
+  ) => Promise<{ ofType: DenormalizeFunction<DataTypes> }>,
+  fromData: (data: NormalizedData<DataTypes>) => { ofType: DenormalizeFunction<DataTypes> },
+};
+
+export type DenormalizeFunction<
+  DataTypes extends SchemaStructure
 > = <
   EntityKey extends keyof DataTypes,
   KeyPath extends ObjectKey<DataTypes[EntityKey], KeyTypes>,
   T extends DataTypes[EntityKey]
 >(
-  normalizedData: NormalizedData<DataTypes>,
   type: EntityKey,
   options?: DenormalizerFactoryOptions<DataTypes, EntityKey, T>,
 ) => {
   fromKey: (key: T[KeyPath]) => T,
   fromKeys: (keys: T[KeyPath][]) => T[],
-  fromData: (data: T) => T,
-  fromArray: (data: T[]) => T[],
 };
 
 export type ParentRef<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes, Key extends KeyTypes> = {
   type: EntityKey,
   key: Key,
 } | undefined;
+
+export type PreloadEntities<DataTypes extends SchemaStructure> = Map<keyof DataTypes, Set<KeyTypes>>;

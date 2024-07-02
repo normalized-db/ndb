@@ -12,7 +12,9 @@ describe('v3/Normalize', function () {
     expect(actual).toHaveProperty('keyMap', {
       role: new Map([['admin', 0]]),
     });
-    expect(actual).toHaveProperty('tree', {});
+    expect(actual).toHaveProperty('tree', {
+      role: new Map([['admin', undefined]]),
+    });
     expect(actual).toHaveProperty('entities.role', [
       { id: 'admin', name: 'Admin' },
     ]);
@@ -26,6 +28,7 @@ describe('v3/Normalize', function () {
       user: new Map([['user1', 0], ['user2', 1]]),
     });
     expect(actual).toHaveProperty('tree', {
+      role: new Map([['admin', undefined], ['standard', undefined]]),
       user: new Map([
         ['user1', new Map([['role', 'admin']])],
         ['user2', new Map([['role', 'standard']])],
@@ -68,14 +71,15 @@ describe('v3/Normalize', function () {
       comment: new Map([[1, 0], [2, 1]]),
     });
     expect(actual).toHaveProperty('tree', {
+      role: new Map([['admin', undefined], ['standard', undefined]]),
       user: new Map([
         ['user1', new Map([['role', 'admin']])],
         ['user2', new Map([['role', 'standard']])],
       ]),
       blogPost: new Map([
-        [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | KeyTypes[]>([
+        [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
           ['author', 'user1'],
-          ['comments', [1, 2]],
+          ['comments', new Set([1, 2])],
         ])],
       ]),
       comment: new Map([
