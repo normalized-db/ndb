@@ -1,6 +1,6 @@
 {
   "name": "@normalized-db/normalizer",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0-alpha.1",
   "author": "Sandro Schleu",
   "license": "MIT",
   "description": "Normalize and restore `JavaScript` objects based on a simple schema.",
