@@ -1,11 +1,10 @@
 import type { KeyTypes, ObjectKey, SchemaStructure } from '../types/normalizer-config-types';
-import type { NormalizedDataTree, PreloadEntities, Schema, UtilsFunction } from '../types/normalizer-types';
+import type { Depth, NormalizedDataTree, PreloadEntities, Schema, UtilsFunction } from '../types/normalizer-types';
 
 export function buildTools<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
 ): UtilsFunction<DataTypes> {
 
-  // TODO add Depth parameter
   function findEntityKeys<
     EntityType extends keyof DataTypes,
     KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
@@ -13,7 +12,10 @@ export function buildTools<DataTypes extends SchemaStructure>(
   >(
     tree: NormalizedDataTree<DataTypes>,
     rootType: EntityType,
-    rootKeys?: Key | Key[],
+    { rootKeys, depth: rootDepth }: {
+      rootKeys?: Key | Key[],
+      depth?: Depth,
+    } = {},
   ) {
     const { entities, addEntities, hasVisited } = entityMap<DataTypes>();
     traverse(
@@ -23,6 +25,7 @@ export function buildTools<DataTypes extends SchemaStructure>(
         : Array.isArray(rootKeys)
           ? new Set(rootKeys)
           : new Set([rootKeys]),
+      rootDepth,
     );
 
     function traverse<
@@ -32,7 +35,12 @@ export function buildTools<DataTypes extends SchemaStructure>(
     >(
       type: EntityType,
       keys: Set<Key> | undefined,
+      depth: Depth | undefined,
     ) {
+      if (depth === 0) {
+        return;
+      }
+
       const typeSchema = schema[type];
       if (!typeSchema) {
         throw new Error(`Missing schema for type ${String(type)}`);
@@ -64,7 +72,9 @@ export function buildTools<DataTypes extends SchemaStructure>(
 
           const nestedKeys = nestedEntities[nestedProperty as keyof typeof nestedEntities];
           if (nestedKeys) {
-            traverse(target.type, Array.isArray(nestedKeys) ? new Set(nestedKeys) : new Set([nestedKeys]));
+            const nextKeys = Array.isArray(nestedKeys) ? new Set(nestedKeys) : new Set([nestedKeys]);
+            const nextDepth = typeof depth === 'number' ? depth - 1 : depth?.[nestedProperty];
+            traverse(target.type, nextKeys, nextDepth);
           }
         }
       }

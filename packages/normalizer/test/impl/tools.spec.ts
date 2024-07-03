@@ -38,7 +38,7 @@ describe('Tools', function () {
 
     it('Find leaf node by key', async function () {
       const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = tools.findEntityKeys(tree, 'role', 'admin');
+      const actual = tools.findEntityKeys(tree, 'role', { rootKeys: 'admin' });
       expect(actual).toEqual(new Map([
         ['role', new Set(['admin'])],
       ]));
@@ -46,7 +46,7 @@ describe('Tools', function () {
 
     it('Find nodes recursively', async function () {
       const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = tools.findEntityKeys(tree, 'user', 'user1');
+      const actual = tools.findEntityKeys(tree, 'user', { rootKeys: 'user1' });
       expect(actual).toEqual(new Map([
         ['role', new Set(['admin'])],
         ['user', new Set(['user1'])],
@@ -55,7 +55,7 @@ describe('Tools', function () {
 
     it('Find more nodes recursively', async function () {
       const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual1 = tools.findEntityKeys(tree, 'blogPost', 1);
+      const actual1 = tools.findEntityKeys(tree, 'blogPost', { rootKeys: 1 });
       expect(actual1).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
         ['role', new Set(['admin', 'standard'])],
         ['user', new Set(['user1', 'user2'])],
@@ -63,12 +63,47 @@ describe('Tools', function () {
         ['comment', new Set([1, 2])],
       ]));
 
-      const actual2 = tools.findEntityKeys(tree, 'blogPost', 2);
+      const actual2 = tools.findEntityKeys(tree, 'blogPost', { rootKeys: 2 });
       expect(actual2).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
         ['role', new Set(['standard'])],
         ['user', new Set(['user2'])],
         ['blogPost', new Set([2])],
         ['comment', new Set([3])],
+      ]));
+    });
+
+    it('Find more nodes with property-specific depth (1)', function () {
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual = tools.findEntityKeys(tree, 'blogPost', {
+        rootKeys: 1,
+        depth: {
+          author: 2,
+          comments: { author: 0 },
+        },
+      });
+
+      expect(actual).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
+        ['role', new Set(['admin'])],
+        ['user', new Set(['user1'])],
+        ['blogPost', new Set([1])],
+        ['comment', new Set([1, 2])],
+      ]));
+    });
+
+    it('Find more nodes with property-specific depth (2)', function () {
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual = tools.findEntityKeys(tree, 'blogPost', {
+        rootKeys: 1,
+        depth: {
+          author: 1,
+          comments: { author: 1 },
+        },
+      });
+
+      expect(actual).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
+        ['user', new Set(['user1', 'user2'])],
+        ['blogPost', new Set([1])],
+        ['comment', new Set([1, 2])],
       ]));
     });
 

@@ -43,7 +43,10 @@ export type UtilsFunction<DataTypes extends SchemaStructure> = {
   >(
     tree: NormalizedDataTree<DataTypes>,
     rootType: EntityType,
-    rootKeys?: Key | Key[],
+    options?: {
+      rootKeys?: Key | Key[],
+      depth?: Depth,
+    },
   ) => PreloadEntities<DataTypes>,
 };
 
