@@ -1,5 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
+import { normalizedDb } from '../../src/main';
 import { Objects } from '../../src/utils/objects';
+import { type AbstractDemoSchema, type DemoStructure, schemaConfig } from '../mock-data';
 
 describe('Object Utils', function () {
 
@@ -58,19 +60,74 @@ describe('Object Utils', function () {
       expect(actual).toEqual({ item1: true, item2: true });
     });
 
-    it('Custom merge', async function () {
-      const actual = Objects.merge(
-        { data: new Set(['item1']) },
-        { data: new Set(['item2']) },
-        {
-          data: (value1, value2) => {
-            const merged = new Set(value1);
-            value2.forEach(next => merged.add(next));
-            return merged;
+    describe('Merge recursively', function () {
+
+      it('Distinct trees', async function () {
+        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+        const actual = Objects.merge(
+          {
+            role: { admin: { refs: { user: ['user1'] } } },
           },
-        },
-      );
-      expect(actual).toEqual({ data: new Set(['item1', 'item2']) });
+          {
+            user: { user1: { props: { role: 'admin' } } },
+          },
+        );
+
+        expect(actual).toEqual({
+          role: { admin: { refs: { user: ['user1'] } } },
+          user: { user1: { props: { role: 'admin' } } },
+        });
+      });
+
+      it('Overlapping types with distinct keys', async function () {
+        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+        const actual = Objects.merge(
+          {
+            role: {
+              admin: { refs: { user: ['user1'] } },
+            },
+            user: {
+              user1: { props: { role: 'admin' } },
+            },
+          },
+          {
+            role: {
+              standard: { refs: { user: ['user2'] } },
+            },
+            user: {
+              user2: { props: { role: 'standard' } },
+            },
+          },
+        );
+
+        expect(actual).toEqual({
+          role: {
+            admin: { refs: { user: ['user1'] } },
+            standard: { refs: { user: ['user2'] } },
+          },
+          user: {
+            user1: { props: { role: 'admin' } },
+            user2: { props: { role: 'standard' } },
+          },
+        });
+      });
+
+      it('Overlapping with conflicting keys', async function () {
+        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+        const actual = Objects.merge(
+          {
+            blogPost: { 1: { props: { author: 'admin', comments: [1] } } },
+          },
+          {
+            blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
+          },
+        );
+
+        expect(actual).toEqual({
+          blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
+        });
+      });
+
     });
   });
 });

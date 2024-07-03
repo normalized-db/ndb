@@ -24,20 +24,12 @@ export namespace Objects {
   /**
    * Currently implemented merge strategy is as follows:
    * - `undefined`/`null`-values and empty arrays are always replaced
-   * - if, for a property, a merge function is specified, this will be called
    * - any remaining property will be overridden
    *
    * @param item1
    * @param item2
-   * @param merge
    */
-  export function merge<T extends Record<string, unknown>>(
-    item1: T,
-    item2: T,
-    merge?: {
-      [Key in keyof T]: (value1: T[Key], value2: T[Key]) => T[Key]
-    },
-  ): T {
+  export function merge<T extends Record<string, unknown>>(item1: T, item2: T): T {
     const merged: any = { ...item1 };
     for (const key of Object.keys(item2)) {
       const existingValue: any = merged[key];
@@ -46,9 +38,13 @@ export namespace Objects {
         continue;
       }
 
-      const customMergeFunc = merge?.[key];
-      if (customMergeFunc) {
-        merged[key] = customMergeFunc(existingValue, item2[key] as any);
+      if (
+        typeof existingValue === 'object' &&
+        !Array.isArray(existingValue) &&
+        !(existingValue instanceof Date) &&
+        !(existingValue instanceof Blob)
+      ) {
+        merged[key] = merge(existingValue, item2[key] as any);
       } else {
         merged[key] = item2[key];
       }

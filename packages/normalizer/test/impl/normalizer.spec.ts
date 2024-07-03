@@ -3,7 +3,7 @@ import { normalizedDb } from '../../src/main';
 import type { NormalizedData } from '../../src/types/normalizer-types';
 import { type AbstractDemoSchema, type DemoStructure, MockData, schemaConfig } from '../mock-data';
 
-describe('v3/Normalize', function () {
+describe('Normalize', function () {
 
   it('Role', function () {
     const { normalize } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);

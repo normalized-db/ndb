@@ -1,26 +1,9 @@
 import type { KeyTypes, ObjectKey, SchemaStructure } from '../types/normalizer-config-types';
 import type { NormalizedDataTree, PreloadEntities, Schema, StateFunction } from '../types/normalizer-types';
-import { Objects } from '../utils/objects';
 
 export function buildState<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
 ): StateFunction<DataTypes> {
-
-  function mergeTrees(tree1: NormalizedDataTree<DataTypes>, tree2: NormalizedDataTree<DataTypes>) {
-    const mergedTree: NormalizedDataTree<DataTypes> = { ...tree1 };
-    for (const typeOfTree2 in tree2) {
-      const typeTree2 = tree2[typeOfTree2];
-      Objects.patch(mergedTree, typeOfTree2, typeTree2 as any, typeTree1 => {
-        for (const entityKey2 in typeTree2) {
-          const entity2 = typeTree2[entityKey2];
-          Objects.patch(typeTree1, entityKey2, entity2, entity1 => Objects.merge(entity1, entity2));
-        }
-        return typeTree1;
-      });
-    }
-
-    return mergedTree;
-  }
 
   // TODO add Depth parameter
   function findEntityKeys<
@@ -91,7 +74,6 @@ export function buildState<DataTypes extends SchemaStructure>(
   }
 
   return {
-    mergeTrees,
     findEntityKeys,
   };
 }

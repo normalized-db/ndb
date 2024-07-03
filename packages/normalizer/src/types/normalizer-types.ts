@@ -36,7 +36,6 @@ export type EntityProperty<DataTypes extends SchemaStructure> = {
 };
 
 export type StateFunction<DataTypes extends SchemaStructure> = {
-  mergeTrees: (tree1: NormalizedDataTree<DataTypes>, tree2: NormalizedDataTree<DataTypes>) => NormalizedDataTree<DataTypes>,
   findEntityKeys: <
     EntityType extends keyof DataTypes,
     KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,

@@ -4,77 +4,7 @@ import type { KeyTypes } from '../../src/types/normalizer-config-types';
 import type { NormalizedDataTree } from '../../src/types/normalizer-types';
 import { type AbstractDemoSchema, type DemoStructure, schemaConfig } from '../mock-data';
 
-describe('v3/State', function () {
-
-  describe('Merge trees', function () {
-
-    it('Distinct trees', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.mergeTrees(
-        {
-          role: { admin: { refs: { user: ['user1'] } } },
-        },
-        {
-          user: { user1: { props: { role: 'admin' } } },
-        },
-      );
-
-      expect(actual).toEqual({
-        role: { admin: { refs: { user: ['user1'] } } },
-        user: { user1: { props: { role: 'admin' } } },
-      });
-    });
-
-    it('Overlapping types with distinct keys', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.mergeTrees(
-        {
-          role: {
-            admin: { refs: { user: ['user1'] } },
-          },
-          user: {
-            user1: { props: { role: 'admin' } },
-          },
-        },
-        {
-          role: {
-            standard: { refs: { user: ['user2'] } },
-          },
-          user: {
-            user2: { props: { role: 'standard' } },
-          },
-        },
-      );
-
-      expect(actual).toEqual({
-        role: {
-          admin: { refs: { user: ['user1'] } },
-          standard: { refs: { user: ['user2'] } },
-        },
-        user: {
-          user1: { props: { role: 'admin' } },
-          user2: { props: { role: 'standard' } },
-        },
-      });
-    });
-
-    it('Overlapping with conflicting keys', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.mergeTrees(
-        {
-          blogPost: { 1: { props: { author: 'admin', comments: [1] } } },
-        },
-        {
-          blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
-        },
-      );
-
-      expect(actual).toEqual({
-        blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
-      });
-    });
-
-  });
+describe('State', function () {
 
   describe('Find entity keys', function () {
 

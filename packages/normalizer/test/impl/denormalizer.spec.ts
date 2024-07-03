@@ -3,7 +3,7 @@ import { normalizedDb } from '../../src/main';
 import type { NormalizedData } from '../../src/types/normalizer-types';
 import { type AbstractDemoSchema, type DemoStructure, type MockBlogPost, MockData, schemaConfig } from '../mock-data';
 
-describe('v3/Denormalize', function () {
+describe('Denormalize', function () {
 
   const { denormalizer } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
 
