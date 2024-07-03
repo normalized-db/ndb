@@ -1,9 +1,9 @@
 import type { KeyTypes, ObjectKey, SchemaStructure } from '../types/normalizer-config-types';
-import type { NormalizedDataTree, PreloadEntities, Schema, StateFunction } from '../types/normalizer-types';
+import type { NormalizedDataTree, PreloadEntities, Schema, UtilsFunction } from '../types/normalizer-types';
 
-export function buildState<DataTypes extends SchemaStructure>(
+export function buildTools<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
-): StateFunction<DataTypes> {
+): UtilsFunction<DataTypes> {
 
   // TODO add Depth parameter
   function findEntityKeys<

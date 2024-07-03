@@ -4,7 +4,7 @@ import type { KeyTypes } from '../../src/types/normalizer-config-types';
 import type { NormalizedDataTree } from '../../src/types/normalizer-types';
 import { type AbstractDemoSchema, type DemoStructure, schemaConfig } from '../mock-data';
 
-describe('State', function () {
+describe('Tools', function () {
 
   describe('Find entity keys', function () {
 
@@ -29,24 +29,24 @@ describe('State', function () {
     };
 
     it('Find leaf node', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.findEntityKeys(tree, 'role');
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual = tools.findEntityKeys(tree, 'role');
       expect(actual).toEqual(new Map([
         ['role', new Set(['admin', 'standard'])],
       ]));
     });
 
     it('Find leaf node by key', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.findEntityKeys(tree, 'role', 'admin');
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual = tools.findEntityKeys(tree, 'role', 'admin');
       expect(actual).toEqual(new Map([
         ['role', new Set(['admin'])],
       ]));
     });
 
     it('Find nodes recursively', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual = state.findEntityKeys(tree, 'user', 'user1');
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual = tools.findEntityKeys(tree, 'user', 'user1');
       expect(actual).toEqual(new Map([
         ['role', new Set(['admin'])],
         ['user', new Set(['user1'])],
@@ -54,8 +54,8 @@ describe('State', function () {
     });
 
     it('Find more nodes recursively', async function () {
-      const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
-      const actual1 = state.findEntityKeys(tree, 'blogPost', 1);
+      const { tools } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const actual1 = tools.findEntityKeys(tree, 'blogPost', 1);
       expect(actual1).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
         ['role', new Set(['admin', 'standard'])],
         ['user', new Set(['user1', 'user2'])],
@@ -63,7 +63,7 @@ describe('State', function () {
         ['comment', new Set([1, 2])],
       ]));
 
-      const actual2 = state.findEntityKeys(tree, 'blogPost', 2);
+      const actual2 = tools.findEntityKeys(tree, 'blogPost', 2);
       expect(actual2).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
         ['role', new Set(['standard'])],
         ['user', new Set(['user2'])],

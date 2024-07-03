@@ -1,7 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { normalizedDb } from '../../src/main';
 import { Objects } from '../../src/utils/objects';
-import { type AbstractDemoSchema, type DemoStructure, schemaConfig } from '../mock-data';
 
 describe('Object Utils', function () {
 
@@ -63,7 +61,6 @@ describe('Object Utils', function () {
     describe('Merge recursively', function () {
 
       it('Distinct trees', async function () {
-        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
         const actual = Objects.merge(
           {
             role: { admin: { refs: { user: ['user1'] } } },
@@ -80,7 +77,6 @@ describe('Object Utils', function () {
       });
 
       it('Overlapping types with distinct keys', async function () {
-        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
         const actual = Objects.merge(
           {
             role: {
@@ -113,7 +109,6 @@ describe('Object Utils', function () {
       });
 
       it('Overlapping with conflicting keys', async function () {
-        const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
         const actual = Objects.merge(
           {
             blogPost: { 1: { props: { author: 'admin', comments: [1] } } },

@@ -3,7 +3,7 @@ import type { FlattenArray } from './utils-types';
 
 export type NormalizedDb<DataTypes extends SchemaStructure> = {
   schema: Schema<DataTypes>;
-  state: StateFunction<DataTypes>;
+  tools: UtilsFunction<DataTypes>;
   normalize: NormalizeFunction<DataTypes>;
   denormalizer: DenormalizerFactory<DataTypes>;
 };
@@ -35,7 +35,7 @@ export type EntityProperty<DataTypes extends SchemaStructure> = {
   cascadeRemoval: boolean;
 };
 
-export type StateFunction<DataTypes extends SchemaStructure> = {
+export type UtilsFunction<DataTypes extends SchemaStructure> = {
   findEntityKeys: <
     EntityType extends keyof DataTypes,
     KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
