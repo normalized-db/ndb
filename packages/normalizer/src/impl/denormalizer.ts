@@ -7,6 +7,8 @@ import type {
   NormalizedData,
   Schema,
 } from '../types/normalizer-types';
+import { Arrays } from '../utils/arrays';
+import { Objects } from '../utils/objects';
 
 export function denormalizerFactory<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
@@ -15,24 +17,19 @@ export function denormalizerFactory<DataTypes extends SchemaStructure>(
 
   return {
     async preload(tree, entities, load) {
-      const data: NormalizedData<DataTypes> = { tree, keyMap: {}, entities: {} };
+      const normalizedData: NormalizedData<DataTypes> = { tree, keyMap: {}, entities: {} };
       for (const [type, keys] of entities) {
         const denormalizedItems = await load(type, [...keys].toSorted());
         for (const item of denormalizedItems) {
           const key = item[schema[type].key];
-          const keyMap = data.keyMap[type];
-          if (!keyMap) {
-            data.keyMap[type] = new Map([[key, 0]]);
-            data.entities[type] = [item];
-          } else {
-            keyMap.set(key, data.entities[type]?.length ?? 0);
-            data.entities[type]!.push(item);
-          }
+          const entities = Objects.patch(normalizedData.entities, type, []);
+          const { index } = Arrays.pushDistinct(entities, item, (a, b) => a[key] === b[key]);
+          Objects.patch(normalizedData.keyMap, type, { [key]: index }, map => ({ ...map, [key]: index }));
         }
       }
 
       return {
-        ofType: denormalizer(schema, data, defaultOptions),
+        ofType: denormalizer(schema, normalizedData, defaultOptions),
       };
     },
     fromData(data) {
@@ -50,9 +47,6 @@ export function denormalizer<DataTypes extends SchemaStructure>(
 ): DenormalizeFunction<DataTypes> {
   return (type, options) => {
     const depth = (options?.depth !== undefined ? options.depth : defaultOptions?.depth) as Depth | undefined;
-    const deleteReverseRefs = options?.reverseRefsDeleted !== undefined
-      ? options.reverseRefsDeleted
-      : (defaultOptions?.reverseRefsDeleted ?? false);
 
     function fromKey<
       EntityKey extends keyof DataTypes,
@@ -60,7 +54,7 @@ export function denormalizer<DataTypes extends SchemaStructure>(
       T extends DataTypes[EntityKey]
     >(nestedType: EntityKey, key: T[KeyPath], nestedDepth: Depth | undefined): T {
       const { key: keyProperty, targets } = schema[nestedType];
-      const index = normalizedData.keyMap[nestedType]?.get(key);
+      const index = normalizedData.keyMap[nestedType]?.[key];
       const entity = index !== undefined && index >= 0
         ? normalizedData.entities[nestedType]?.[index]
         : normalizedData.entities[nestedType]?.find(entity => entity[keyProperty] === key);
@@ -77,18 +71,15 @@ export function denormalizer<DataTypes extends SchemaStructure>(
           }
 
           const nextDepth = typeof nestedDepth === 'number' ? nestedDepth - 1 : nestedDepth?.[nestedProperty];
-          const nestedKeys = entity[nestedProperty];
-          denormalizedEntity[nestedProperty] = Array.isArray(nestedKeys)
+          // @ts-ignore
+          const nestedKeys = normalizedData.tree[nestedType]?.[key]?.props?.[nestedProperty];
+          denormalizedEntity[nestedProperty as keyof DataTypes[EntityKey]] = Array.isArray(nestedKeys)
             ? fromKeys(target.type, nestedKeys, nextDepth)
             : fromKey(target.type, nestedKeys, nextDepth);
         }
       }
 
-      if (deleteReverseRefs) {
-        delete denormalizedEntity._refs;
-      }
-
-      return denormalizedEntity;
+      return denormalizedEntity as T;
     }
 
     function fromKeys<
@@ -103,8 +94,9 @@ export function denormalizer<DataTypes extends SchemaStructure>(
       fromKey: key => fromKey(type, key, depth),
       fromKeys: keys => fromKeys(type, keys, depth),
       all: () => {
-        const keys = normalizedData.keyMap[type]?.keys();
-        return keys ? fromKeys(type, [...keys], depth) : [];
+        const keyMap = normalizedData.keyMap[type];
+        const keys = keyMap ? Object.keys(keyMap) : [];
+        return keys.length > 0 ? fromKeys(type, [...keys], depth) : [];
       },
     };
   };

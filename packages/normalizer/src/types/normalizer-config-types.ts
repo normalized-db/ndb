@@ -2,7 +2,7 @@ export type NormalizableObject = InstanceType<any>;
 export type SchemaStructure = Record<string, NormalizableObject>;
 export type AbstractSchemaStructure = Record<string, NormalizableObject>;
 
-export type KeyTypes = string | number | Date;
+export type KeyTypes = string | number;
 
 export type ObjectKey<T, WhereExtends = any> = {
   [K in keyof T]: T[K] extends WhereExtends ? K : never;

@@ -1,15 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { normalizedDb } from '../../src/main';
 import type { NormalizedData } from '../../src/types/normalizer-types';
-import {
-  type AbstractDemoSchema,
-  type DemoStructure,
-  type MockComment,
-  MockData,
-  type MockUser,
-  type MockUserRole,
-  schemaConfig,
-} from '../mock-data';
+import { type AbstractDemoSchema, type DemoStructure, type MockBlogPost, MockData, schemaConfig } from '../mock-data';
 
 describe('v3/Denormalize', function () {
 
@@ -17,8 +9,8 @@ describe('v3/Denormalize', function () {
 
   it('Role', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
-      keyMap: { role: new Map([['admin', 0], ['standard', 1]]) },
-      tree: {},
+      keyMap: { role: { admin: 0, standard: 1 } },
+      tree: { role: { admin: {}, standard: {} } },
       entities: {
         role: [
           { id: 'admin', name: 'Admin' },
@@ -45,24 +37,33 @@ describe('v3/Denormalize', function () {
   it('User', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
       keyMap: {
-        role: new Map([['admin', 0], ['standard', 1]]),
-        user: new Map([['user1', 0], ['user2', 1]]),
+        role: { admin: 0, standard: 1 },
+        user: { user1: 0, user2: 1 },
       },
-      tree: {},
+      tree: {
+        role: {
+          admin: { refs: { user: ['user1'] } },
+          standard: { refs: { user: ['user2'] } },
+        },
+        user: {
+          user1: { props: { role: 'admin' } },
+          user2: { props: { role: 'standard' } },
+        },
+      },
       entities: {
         role: [
-          { id: 'admin', name: 'Admin', _refs: { user: new Set(['user1']) } },
-          { id: 'standard', name: 'Standard', _refs: { user: new Set(['user2']) } },
+          { id: 'admin', name: 'Admin' },
+          { id: 'standard', name: 'Standard' },
         ],
         user: [
-          { createdAt: MockData.user1.createdAt, userName: 'user1', name: 'User 1', role: 'admin' } as any as MockUser,
-          { createdAt: MockData.user2.createdAt, userName: 'user2', name: 'User 2', role: 'standard' } as any as MockUser,
+          { createdAt: MockData.user1.createdAt, userName: 'user1', name: 'User 1' },
+          { createdAt: MockData.user2.createdAt, userName: 'user2', name: 'User 2' },
         ],
       },
     };
 
     const [actual1, actual2] = denormalizer.fromData(normalizedData)
-      .ofType('user', { reverseRefsDeleted: true })
+      .ofType('user')
       .fromKeys(['user1', 'user2']);
 
     expect(actual1).toEqual(MockData.user1);
@@ -72,66 +73,77 @@ describe('v3/Denormalize', function () {
   describe('Blog Post', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
       keyMap: {
-        role: new Map([['admin', 0], ['standard', 1]]),
-        user: new Map([['user1', 0], ['user2', 1]]),
-        blogPost: new Map([[1, 0]]),
-        comment: new Map([[1, 0], [2, 1]]),
+        role: { admin: 0, standard: 1 },
+        user: { user1: 0, user2: 1 },
+        blogPost: { 1: 0 },
+        comment: { 1: 0, 2: 1 },
       },
-      tree: {},
+      tree: {
+        role: {
+          admin: { refs: { user: ['user1'] } },
+          standard: { refs: { user: ['user2'] } },
+        },
+        user: {
+          user1: { props: { role: 'admin' }, refs: { blogPost: [1], comment: [1] } },
+          user2: { props: { role: 'standard' }, refs: { blogPost: [2], comment: [2, 3] } },
+        },
+        blogPost: {
+          1: { props: { author: 'user1', comments: [1, 2] } },
+          2: { props: { author: 'user2', comments: [3] } },
+        },
+        comment: {
+          1: { props: { author: 'user1' }, refs: { blogPost: [1] } },
+          2: { props: { author: 'user2' }, refs: { blogPost: [1] } },
+          3: { props: { author: 'user2' }, refs: { blogPost: [2] } },
+        },
+      },
       entities: {
         role: [
-          { id: 'admin', name: 'Admin', _refs: { user: new Set(['user1']) } },
-          { id: 'standard', name: 'Standard', _refs: { user: new Set(['user2']) } },
+          { id: 'admin', name: 'Admin' },
+          { id: 'standard', name: 'Standard' },
         ],
         user: [
-          {
-            createdAt: MockData.user1.createdAt, userName: 'user1', name: 'User 1', role: 'admin' as any as MockUserRole,
-            _refs: { blogPost: new Set([1]), comment: new Set([1]) },
-          },
-          {
-            createdAt: MockData.user2.createdAt, userName: 'user2', name: 'User 2', role: 'standard' as any as MockUserRole,
-            _refs: { comment: new Set([2]) },
-          },
+          { createdAt: MockData.user1.createdAt, userName: 'user1', name: 'User 1' },
+          { createdAt: MockData.user2.createdAt, userName: 'user2', name: 'User 2' },
         ],
         blogPost: [
-          { id: 1, title: 'Post 1', author: 'user1' as any as MockUser, comments: [1, 2] as any as MockComment[] },
-          { id: 2, title: 'Post 2', author: 'user2' as any as MockUser, comments: [3] as any as MockComment[] },
+          { id: 1, title: 'Post 1' },
+          { id: 2, title: 'Post 2' },
         ],
         comment: [
-          { id: 1, text: 'Comment 1.1', author: 'user1' as any as MockUser, _refs: { blogPost: new Set([1]) } },
-          { id: 2, text: 'Comment 1.2', author: 'user2' as any as MockUser, _refs: { blogPost: new Set([1]) } },
-          { id: 3, text: 'Comment 2.1', author: 'user2' as any as MockUser, _refs: { blogPost: new Set([2]) } },
+          { id: 1, text: 'Comment 1.1' },
+          { id: 2, text: 'Comment 1.2' },
+          { id: 3, text: 'Comment 2.1' },
         ],
       },
     };
 
     it('Blog post', function () {
       const actual1 = denormalizer.fromData(normalizedData)
-        .ofType('blogPost', { reverseRefsDeleted: true })
+        .ofType('blogPost')
         .fromKey(1);
       expect(actual1).toEqual(MockData.blogPost1);
     });
 
     it('Blog post with numeric depth', function () {
       const actual = denormalizer.fromData(normalizedData)
-        .ofType('blogPost', { reverseRefsDeleted: true, depth: 1 })
+        .ofType('blogPost', { depth: 1 })
         .fromKey(1);
 
       expect(actual).toEqual({
         id: 1,
         title: 'Post 1',
-        author: { ...MockData.user1, role: MockData.user1.role.id },
+        author: { ...MockData.user1, role: undefined } as any,
         comments: [
-          { id: 1, text: 'Comment 1.1', author: MockData.user1.userName },
-          { id: 2, text: 'Comment 1.2', author: MockData.user2.userName },
+          { id: 1, text: 'Comment 1.1', author: undefined } as any,
+          { id: 2, text: 'Comment 1.2', author: undefined },
         ],
-      });
+      } satisfies MockBlogPost);
     });
 
     it('Blog post with property-specific depth', function () {
       const actual = denormalizer.fromData(normalizedData)
         .ofType('blogPost', {
-          reverseRefsDeleted: true,
           depth: {
             author: 2,
             comments: { author: 0 },
@@ -144,10 +156,10 @@ describe('v3/Denormalize', function () {
         title: 'Post 1',
         author: MockData.user1,
         comments: [
-          { id: 1, text: 'Comment 1.1', author: { ...MockData.user1, role: MockData.user1.role.id } },
-          { id: 2, text: 'Comment 1.2', author: { ...MockData.user2, role: MockData.user2.role.id } },
+          { id: 1, text: 'Comment 1.1', author: { ...MockData.user1, role: undefined } as any },
+          { id: 2, text: 'Comment 1.2', author: { ...MockData.user2, role: undefined } },
         ],
-      });
+      } satisfies MockBlogPost);
     });
 
   });

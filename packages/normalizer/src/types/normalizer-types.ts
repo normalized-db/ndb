@@ -49,28 +49,33 @@ export type StateFunction<DataTypes extends SchemaStructure> = {
 };
 
 export type NormalizedData<DataTypes extends SchemaStructure> = {
-  keyMap: KeyMap<DataTypes>,
   tree: NormalizedDataTree<DataTypes>,
+  keyMap: KeyMap<DataTypes>,
   entities: NormalizedEntities<DataTypes>,
-};
-
-export type KeyMap<DataTypes extends SchemaStructure> = {
-  [EntityKey in keyof DataTypes]?: Map<KeyTypes, number>;
 };
 
 export type NormalizedDataTree<DataTypes extends SchemaStructure> = {
   [EntityKey in keyof DataTypes]?: EntityTree<DataTypes, EntityKey>
 };
 
-export type EntityTree<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> =
-  Map<KeyTypes, undefined | Map<keyof DataTypes[EntityKey], KeyTypes | Set<KeyTypes>>>;
-
-export type NormalizedEntities<DataTypes extends SchemaStructure> = {
-  [EntityKey in keyof DataTypes]?: NormalizedItem<DataTypes, EntityKey>[]
+export type EntityTree<DataTypes extends SchemaStructure, EntityType extends keyof DataTypes> = {
+  [Key in KeyTypes]: {
+    props?: { [Property in ObjectKey<DataTypes[EntityType], object | object[]>]?: KeyTypes | KeyTypes[] },
+    refs?: { [ParentType in keyof DataTypes]?: KeyTypes[] },
+  }
 };
 
-export type NormalizedItem<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> =
-  DataTypes[EntityKey] & { _refs?: ReverseReferences<DataTypes> };
+export type KeyMap<DataTypes extends SchemaStructure> = {
+  [EntityKey in keyof DataTypes]?: {
+    [Key in KeyTypes]: number
+  };
+};
+
+export type NormalizedEntities<DataTypes extends SchemaStructure> = {
+  [EntityType in keyof DataTypes]?: NormalizedItem<DataTypes, EntityType>[]
+};
+
+export type NormalizedItem<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes> = Partial<DataTypes[EntityKey]>;
 
 export type ReverseReferences<DataTypes extends SchemaStructure> = {
   [type in keyof DataTypes]?: Set<KeyTypes>;
@@ -82,7 +87,6 @@ export type UniqueKeyCallback<DataTypes extends SchemaStructure> = <
 > (type: EntityKey) => T[EntityKey];
 
 export type NormalizeOptions<DataTypes extends SchemaStructure> = {
-  reverseRefs?: boolean,
   uniqueKeyCallback?: UniqueKeyCallback<DataTypes>,
 };
 
@@ -105,7 +109,6 @@ export type DenormalizerFactoryOptions<
   T extends DataTypes[EntityKey]
 > = {
   depth?: Depth<T>,
-  reverseRefsDeleted?: boolean,
 };
 
 export type DenormalizerFactory<

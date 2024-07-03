@@ -12,16 +12,16 @@ describe('v3/State', function () {
       const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
       const actual = state.mergeTrees(
         {
-          role: new Map([['admin', undefined]]),
+          role: { admin: { refs: { user: ['user1'] } } },
         },
         {
-          user: new Map([['user1', new Map([['role', 'admin']])]]),
+          user: { user1: { props: { role: 'admin' } } },
         },
       );
 
       expect(actual).toEqual({
-        role: new Map([['admin', undefined]]),
-        user: new Map([['user1', new Map([['role', 'admin']])]]),
+        role: { admin: { refs: { user: ['user1'] } } },
+        user: { user1: { props: { role: 'admin' } } },
       });
     });
 
@@ -29,21 +29,32 @@ describe('v3/State', function () {
       const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
       const actual = state.mergeTrees(
         {
-          role: new Map([['admin', undefined]]),
-          user: new Map([['user1', new Map([['role', 'admin']])]]),
+          role: {
+            admin: { refs: { user: ['user1'] } },
+          },
+          user: {
+            user1: { props: { role: 'admin' } },
+          },
         },
         {
-          role: new Map([['standard', undefined]]),
-          user: new Map([['user2', new Map([['role', 'standard']])]]),
+          role: {
+            standard: { refs: { user: ['user2'] } },
+          },
+          user: {
+            user2: { props: { role: 'standard' } },
+          },
         },
       );
 
       expect(actual).toEqual({
-        role: new Map([['admin', undefined], ['standard', undefined]]),
-        user: new Map([
-          ['user1', new Map([['role', 'admin']])],
-          ['user2', new Map([['role', 'standard']])],
-        ]),
+        role: {
+          admin: { refs: { user: ['user1'] } },
+          standard: { refs: { user: ['user2'] } },
+        },
+        user: {
+          user1: { props: { role: 'admin' } },
+          user2: { props: { role: 'standard' } },
+        },
       });
     });
 
@@ -51,30 +62,15 @@ describe('v3/State', function () {
       const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
       const actual = state.mergeTrees(
         {
-          blogPost: new Map([
-            [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
-              ['author', 'admin'],
-              ['comments', new Set([1])],
-            ])],
-          ]),
+          blogPost: { 1: { props: { author: 'admin', comments: [1] } } },
         },
         {
-          blogPost: new Map([
-            [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
-              ['author', 'standard'],
-              ['comments', new Set([2])],
-            ])],
-          ]),
+          blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
         },
       );
 
       expect(actual).toEqual({
-        blogPost: new Map([
-          [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
-            ['author', 'standard'],
-            ['comments', new Set([1, 2])],
-          ])],
-        ]),
+        blogPost: { 1: { props: { author: 'standard', comments: [2] } } },
       });
     });
 
@@ -83,29 +79,26 @@ describe('v3/State', function () {
   describe('Find entity keys', function () {
 
     const tree: NormalizedDataTree<DemoStructure> = {
-      role: new Map([['admin', undefined], ['standard', undefined]]),
-      user: new Map([
-        ['user1', new Map([['role', 'admin']])],
-        ['user2', new Map([['role', 'standard']])],
-      ]),
-      blogPost: new Map([
-        [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
-          ['author', 'user1'],
-          ['comments', new Set([1, 2])],
-        ])],
-        [2, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
-          ['author', 'user2'],
-          ['comments', new Set([3])],
-        ])],
-      ]),
-      comment: new Map([
-        [1, new Map([['author', 'user2']])],
-        [2, new Map([['author', 'user1']])],
-        [3, new Map([['author', 'user2']])],
-      ]),
+      role: {
+        admin: { refs: { user: ['user1'] } },
+        standard: { refs: { user: ['user2'] } },
+      },
+      user: {
+        user1: { props: { role: 'admin' }, refs: { blogPost: [1], comment: [2, 3] } },
+        user2: { props: { role: 'standard' }, refs: { blogPost: [2], comment: [1] } },
+      },
+      blogPost: {
+        1: { props: { author: 'user1', comments: [1, 2] } },
+        2: { props: { author: 'user2', comments: [3] } },
+      },
+      comment: {
+        1: { props: { author: 'user2' }, refs: { blogPost: [1] } },
+        2: { props: { author: 'user1' }, refs: { blogPost: [1] } },
+        3: { props: { author: 'user2' }, refs: { blogPost: [2] } },
+      },
     };
 
-    it('Find leave node', async function () {
+    it('Find leaf node', async function () {
       const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
       const actual = state.findEntityKeys(tree, 'role');
       expect(actual).toEqual(new Map([
@@ -113,7 +106,7 @@ describe('v3/State', function () {
       ]));
     });
 
-    it('Find leave node by key', async function () {
+    it('Find leaf node by key', async function () {
       const { state } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
       const actual = state.findEntityKeys(tree, 'role', 'admin');
       expect(actual).toEqual(new Map([
@@ -139,6 +132,7 @@ describe('v3/State', function () {
         ['blogPost', new Set([1])],
         ['comment', new Set([1, 2])],
       ]));
+
       const actual2 = state.findEntityKeys(tree, 'blogPost', 2);
       expect(actual2).toEqual(new Map<keyof DemoStructure, Set<KeyTypes>>([
         ['role', new Set(['standard'])],

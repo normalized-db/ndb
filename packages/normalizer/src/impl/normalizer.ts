@@ -1,6 +1,7 @@
 import type { KeyTypes, SchemaStructure } from '../types/normalizer-config-types';
 import type { NormalizedData, NormalizedItem, NormalizeFunction, NormalizeOptions, ParentRef, Schema } from '../types/normalizer-types';
-import { mergeObjects, mergeReverseReferences } from '../utils';
+import { Arrays } from '../utils/arrays';
+import { Objects } from '../utils/objects';
 
 export function normalizer<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
@@ -8,9 +9,6 @@ export function normalizer<DataTypes extends SchemaStructure>(
 ): NormalizeFunction<DataTypes> {
   return (rootType, rootData, options) => {
     const uniqueKeyCallback = options?.uniqueKeyCallback ?? defaultOptions?.uniqueKeyCallback;
-    const hasReverseReferences = options?.reverseRefs !== undefined
-      ? options.reverseRefs
-      : (defaultOptions?.reverseRefs ?? false);
 
     const normalizedResult: NormalizedData<DataTypes> = { keyMap: {}, tree: {}, entities: {} };
     apply(undefined, rootType, rootData);
@@ -56,19 +54,13 @@ export function normalizer<DataTypes extends SchemaStructure>(
         key = uniqueKeyCallback<EntityKey, T>(type);
       }
 
-      // add reverse reference to parent (if any)
-      if (parent && hasReverseReferences) {
-        normalizedItem._refs = {
-          [parent.type]: new Set<KeyTypes>([parent.key]),
-        };
-      }
-
-      // log entity in tree
-      const tree = normalizedResult.tree[type];
-      if (!tree) {
-        normalizedResult.tree[type] = new Map([[key, undefined]]);
-      } else {
-        tree.set(key, undefined);
+      // log reverse reference in tree of output structure
+      const entityTypeTree = Objects.patch(normalizedResult.tree, type, {});
+      const entityTree = Objects.patch(entityTypeTree, key, {});
+      if (parent) {
+        const refs = Objects.patch(entityTree, 'refs', {});
+        // @ts-ignore
+        Objects.patch(refs, parent.type, [parent.key], (keys) => Arrays.pushDistinct(keys, parent.key).items);
       }
 
       // extract nested objects and arrays
@@ -87,43 +79,36 @@ export function normalizer<DataTypes extends SchemaStructure>(
           throw new Error(`${ref.type}[${ref.key}].${nestedProperty} expected nested object but was array`);
         }
 
-        // log reference in tree of output structure
         const targetRef = apply(ref, target.type, nestedValue);
-        normalizedItem[nestedProperty] = targetRef;
+        // remove normalized property from normalized structure to safe storage
+        delete normalizedItem[nestedProperty as keyof DataTypes[EntityKey]]; // = Array.isArray(targetRef) ? [] : undefined;
         if (targetRef !== undefined) {
-          const distinctTargetRefs = Array.isArray(targetRef) ? new Set(targetRef) : targetRef;
-          const tree = normalizedResult.tree[type];
-          const entityTree = tree!.get(key);
-          if (!entityTree) {
-            tree!.set(key, new Map([[nestedProperty, distinctTargetRefs]]));
-          } else {
-            entityTree.set(nestedProperty, distinctTargetRefs);
-          }
-        }
-      }
-
-      // add to output
-      const normalizedItemsOfType = normalizedResult.entities[type];
-      if (!normalizedItemsOfType) {
-        normalizedResult.keyMap[type] = new Map([[key, 0]]);
-        normalizedResult.entities[type] = [normalizedItem];
-      } else {
-        const keyMapOfType = normalizedResult.keyMap[type]!;
-        const existingIndex = keyMapOfType.get(key);
-        if (existingIndex === undefined) {
-          keyMapOfType.set(key, normalizedItemsOfType.length);
-          normalizedItemsOfType.push(normalizedItem);
-        } else {
-          normalizedItemsOfType[existingIndex] = mergeObjects<T>(
-            normalizedItemsOfType[existingIndex],
-            normalizedItem,
+          // log property in tree of output structure
+          const props = Objects.patch(entityTree, 'props', {});
+          Objects.patch(
+            props,
             // @ts-ignore
-            hasReverseReferences
-              ? { _refs: mergeReverseReferences }
-              : undefined,
+            nestedProperty,
+            targetRef,
+            (refs) => {
+              if (Array.isArray(refs) && Array.isArray(targetRef)) { // both are an array
+                return Arrays.mergePrimitive(refs, targetRef);
+              } else if (!Array.isArray(refs) && Array.isArray(targetRef)) { // mixing shouldn't even happen, just to be safe
+                return Arrays.pushDistinct(targetRef, refs);
+              } else if (Array.isArray(refs) && !Array.isArray(targetRef)) { // mixing shouldn't even happen, just to be safe
+                return Arrays.pushDistinct(refs, targetRef);
+              } else { // neither are arrays
+                return targetRef;
+              }
+            },
           );
         }
       }
+
+      // add normalized object to output
+      const normalizedItemsOfType = Objects.patch(normalizedResult.entities, type, []);
+      const { index } = Arrays.upsert(normalizedItemsOfType, normalizedItem, (a, b) => a[keyProperty] === b[keyProperty]);
+      Objects.patch(normalizedResult.keyMap, type, { [key]: index }, map => ({ ...map, [key]: index }));
 
       return key;
     }

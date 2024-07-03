@@ -1,41 +1,28 @@
 import type { KeyTypes, ObjectKey, SchemaStructure } from '../types/normalizer-config-types';
 import type { NormalizedDataTree, PreloadEntities, Schema, StateFunction } from '../types/normalizer-types';
+import { Objects } from '../utils/objects';
 
 export function buildState<DataTypes extends SchemaStructure>(
   schema: Schema<DataTypes>,
 ): StateFunction<DataTypes> {
 
   function mergeTrees(tree1: NormalizedDataTree<DataTypes>, tree2: NormalizedDataTree<DataTypes>) {
-    const merged: NormalizedDataTree<DataTypes> = Object.entries(tree1)
-      .reduce((clone, [type, map]) => ({ ...clone, [type]: new Map(map) }), {});
-    for (const type of Object.keys(tree2)) {
-      const mergedType = merged[type];
-      if (!mergedType) {
-        merged[type as keyof DataTypes] = tree2[type];
-      } else {
-        tree2[type]?.forEach((nestedProperties, key) => {
-          const mergedNested = mergedType.get(key);
-          if (!mergedNested) {
-            mergedType.set(key, nestedProperties ? new Map(nestedProperties) : undefined);
-          } else if (nestedProperties) {
-            nestedProperties.forEach((nestedKeys, propertyKey) => {
-              const mergedKeys = mergedNested.get(propertyKey);
-              if (mergedKeys === undefined || !(mergedKeys instanceof Set)) {
-                mergedNested.set(propertyKey, nestedKeys);
-              } else if (nestedKeys instanceof Set) {
-                nestedKeys.forEach(nestedKey => mergedKeys.add(nestedKey));
-              } else {
-                mergedKeys.add(nestedKeys);
-              }
-            });
-          }
-        });
-      }
+    const mergedTree: NormalizedDataTree<DataTypes> = { ...tree1 };
+    for (const typeOfTree2 in tree2) {
+      const typeTree2 = tree2[typeOfTree2];
+      Objects.patch(mergedTree, typeOfTree2, typeTree2 as any, typeTree1 => {
+        for (const entityKey2 in typeTree2) {
+          const entity2 = typeTree2[entityKey2];
+          Objects.patch(typeTree1, entityKey2, entity2, entity1 => Objects.merge(entity1, entity2));
+        }
+        return typeTree1;
+      });
     }
 
-    return merged;
+    return mergedTree;
   }
 
+  // TODO add Depth parameter
   function findEntityKeys<
     EntityType extends keyof DataTypes,
     KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
@@ -46,7 +33,14 @@ export function buildState<DataTypes extends SchemaStructure>(
     rootKeys?: Key | Key[],
   ) {
     const { entities, addEntities, hasVisited } = entityMap<DataTypes>();
-    traverse(rootType, rootKeys === undefined ? undefined : Array.isArray(rootKeys) ? new Set(rootKeys) : new Set([rootKeys]));
+    traverse(
+      rootType,
+      rootKeys === undefined
+        ? undefined
+        : Array.isArray(rootKeys)
+          ? new Set(rootKeys)
+          : new Set([rootKeys]),
+    );
 
     function traverse<
       EntityType extends keyof DataTypes,
@@ -62,27 +56,33 @@ export function buildState<DataTypes extends SchemaStructure>(
       }
 
       const typeTree = tree[type];
-      if (!typeTree || typeTree.size === 0) {
+      if (!typeTree) {
         throw new Error(`Missing data for type ${String(type)}`);
       }
 
-      for (const [entityKey, nestedEntities] of typeTree) {
-        if ((keys !== undefined && !keys.has(entityKey as Key)) || hasVisited(type, entityKey)) {
+      for (const entityKey in typeTree) {
+        const typedEntityKey = (isNaN(+entityKey) ? entityKey : +entityKey) as Key;
+        if ((keys !== undefined && !keys.has(typedEntityKey)) || hasVisited(type, entityKey)) {
           continue;
         }
 
-        addEntities(type, entityKey);
+        addEntities(type, typedEntityKey);
 
+        const nestedEntities = typeTree[typedEntityKey]?.props;
         if (!nestedEntities) {
           continue;
         }
 
-        for (const [nestedProperty, nestedKeys] of nestedEntities) {
+        for (const nestedProperty in nestedEntities) {
           const target = typeSchema.targets[nestedProperty];
           if (!target) {
             throw new Error(`Missing target for ${String(type)}.${String(nestedProperty)}`);
           }
-          traverse(target.type, nestedKeys instanceof Set ? nestedKeys : new Set([nestedKeys]));
+
+          const nestedKeys = nestedEntities[nestedProperty as keyof typeof nestedEntities];
+          if (nestedKeys) {
+            traverse(target.type, Array.isArray(nestedKeys) ? new Set(nestedKeys) : new Set([nestedKeys]));
+          }
         }
       }
     }
