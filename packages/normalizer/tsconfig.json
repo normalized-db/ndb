@@ -18,7 +18,7 @@
     "emitDeclarationOnly": true,
     "emitDecoratorMetadata": true,
     // Linting
-    "strict": false,
+    "strict": true,
     "experimentalDecorators": true
   },
   "exclude": [
