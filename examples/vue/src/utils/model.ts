@@ -1,4 +1,4 @@
-import type { NdbDocument } from '@normalized-db/normalizer';
+import type { NdbDocument } from '@normalized-db/core';
 
 export interface User extends NdbDocument {
   readonly userName: string;

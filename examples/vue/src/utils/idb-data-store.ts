@@ -1,13 +1,12 @@
+import { Schema } from '@normalized-db/core';
 import { DataStore, IdbContextBuilder } from '@normalized-db/data-store';
-import { DenormalizerBuilder, NormalizerBuilder, Schema } from '@normalized-db/normalizer';
+import { DenormalizerBuilder } from '@normalized-db/denormalizer';
+import { NormalizerBuilder } from '@normalized-db/normalizer';
 
 export const schema = new Schema({
   _defaults: {
     key: 'id',
     autoKey: false,
-    logging: {
-      mode: 'simple',
-    },
   },
   _createdBy: {
     targets: {

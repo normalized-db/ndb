@@ -17,12 +17,18 @@ importers:
 
   examples/vue:
     dependencies:
+      '@normalized-db/core':
+        specifier: ^2.5.0-beta.4
+        version: 2.5.0-beta.4
       '@normalized-db/data-store':
-        specifier: workspace:*
-        version: link:../../packages/data-store
+        specifier: ^2.5.0-beta.3
+        version: 2.5.0-beta.3
+      '@normalized-db/denormalizer':
+        specifier: ^2.5.0-beta.4
+        version: 2.5.0-beta.4
       '@normalized-db/normalizer':
-        specifier: workspace:*
-        version: link:../../packages/normalizer
+        specifier: ^2.5.0-beta.4
+        version: 2.5.0-beta.4
       vue:
         specifier: ^3.4.21
         version: 3.4.29(typescript@5.2.2)
@@ -536,6 +542,32 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@normalized-db/core@2.5.0-beta.3':
+    resolution: {integrity: sha512-qYPKscWRetKhOAZMjeoX4jK1E9+yUra7aVwE7crDyN0l1QtjkUwy/kRMrTIKWHJmEKHJtQT0ePDqDeXnfH8MNg==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+  '@normalized-db/core@2.5.0-beta.4':
+    resolution: {integrity: sha512-OwfdYIdEn28LpKXzIFQdfxzUQtqs/uvEtPjMESMtvYEVovXiMVvN/5EOz9yZGQuCoOVpBDuSK6J3QHd4ezJ0WA==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+  '@normalized-db/data-store@2.5.0-beta.3':
+    resolution: {integrity: sha512-7hkxWyePFAgVVOhuD/NWjwB+QFIZuqtu6Na6nv7WsYwtmx20cIYGRBnXYWNG6qKrH58AkIw5ngYrDRA4Rn+ObQ==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+  '@normalized-db/denormalizer@2.5.0-beta.3':
+    resolution: {integrity: sha512-Ur3a/BOg2RkPV/e2/jBgp6t6I5N/ZogJ4k7vPBnFKyYBjlcKjv5Uq4YZGPgH2cjiRkmp1M0UcMmddmq2qetMVw==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+  '@normalized-db/denormalizer@2.5.0-beta.4':
+    resolution: {integrity: sha512-cd2uNT93d6liST2nSEk88mElbuRYda4zUrWxb/+Kr0h/b/jrWzhQ9b2tqUxBRP0sWku624La/3EFAiRZRQ5Hog==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+  '@normalized-db/normalizer@2.5.0-beta.3':
+    resolution: {integrity: sha512-oXcmvIUD4w/3u6hTwmab5Fxcs8RJ8SqLJfNy5Y0E1Eve7No5iusYeM3PO6P6nsmc2f9u2BT/MDMrl7f1JvOt7A==}
+
+  '@normalized-db/normalizer@2.5.0-beta.4':
+    resolution: {integrity: sha512-vKLKjAWRmZjEqyjXhFGptg9Q9FHrg08ijFyZFfMH5haittJW0kyST6O3xYJbloHFBzDXncmHKJ9qKcOuUBwTlQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1166,6 +1198,9 @@ packages:
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
+
+  idb@2.0.3:
+    resolution: {integrity: sha512-Pdm+VwAbZcKrFcFTgvet5FH1ZfLtpiSVhtmw2lsmAMoyf0PIz5Ifr/vXtbjrUAnCZxk4RwxoY4W8aht/sMC8yw==}
 
   idb@8.0.0:
     resolution: {integrity: sha512-l//qvlAKGmQO31Qn7xdzagVPPaHTxXx199MhrAFuVBTPqydcPYBWjkrbv4Y0ktB+GmWOiwHl237UUOrLmQxLvw==}
@@ -2566,6 +2601,33 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
+  '@normalized-db/core@2.5.0-beta.3': {}
+
+  '@normalized-db/core@2.5.0-beta.4': {}
+
+  '@normalized-db/data-store@2.5.0-beta.3':
+    dependencies:
+      '@normalized-db/core': 2.5.0-beta.3
+      '@normalized-db/denormalizer': 2.5.0-beta.3
+      '@normalized-db/normalizer': 2.5.0-beta.3
+      idb: 2.0.3
+
+  '@normalized-db/denormalizer@2.5.0-beta.3':
+    dependencies:
+      '@normalized-db/core': 2.5.0-beta.3
+
+  '@normalized-db/denormalizer@2.5.0-beta.4':
+    dependencies:
+      '@normalized-db/core': 2.5.0-beta.4
+
+  '@normalized-db/normalizer@2.5.0-beta.3':
+    dependencies:
+      '@normalized-db/core': 2.5.0-beta.3
+
+  '@normalized-db/normalizer@2.5.0-beta.4':
+    dependencies:
+      '@normalized-db/core': 2.5.0-beta.4
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -3222,6 +3284,8 @@ snapshots:
   html-escaper@2.0.2: {}
 
   human-signals@2.1.0: {}
+
+  idb@2.0.3: {}
 
   idb@8.0.0: {}
 
