@@ -29,10 +29,17 @@ describe('v3/Denormalize', function () {
 
     const typedDenormalizer = denormalizer.fromData(normalizedData).ofType('role');
     const actual1 = typedDenormalizer.fromKey('admin');
-    const actual2 = typedDenormalizer.fromKey('standard');
 
     expect(actual1).toEqual(MockData.roleAdmin);
-    expect(actual2).toEqual(MockData.roleUser);
+
+    const actual2 = typedDenormalizer.fromKeys(['standard']);
+    expect(actual2).toHaveLength(1);
+    expect(actual2).toContainEqual(MockData.roleUser);
+
+    const actual3 = typedDenormalizer.all();
+    expect(actual3).toHaveLength(2);
+    expect(actual3).toContainEqual(MockData.roleAdmin);
+    expect(actual3).toContainEqual(MockData.roleUser);
   });
 
   it('User', function () {

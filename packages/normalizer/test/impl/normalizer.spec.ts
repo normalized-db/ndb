@@ -73,8 +73,8 @@ describe('v3/Normalize', function () {
     expect(actual).toHaveProperty('tree', {
       role: new Map([['admin', undefined], ['standard', undefined]]),
       user: new Map([
-        ['user1', new Map([['role', 'admin']])],
-        ['user2', new Map([['role', 'standard']])],
+        ['user1', new Map<keyof DemoStructure['user'], KeyTypes | Set<KeyTypes>>([['role', 'admin']])],
+        ['user2', new Map<keyof DemoStructure['user'], KeyTypes | Set<KeyTypes>>([['role', 'standard']])],
       ]),
       blogPost: new Map([
         [1, new Map<keyof DemoStructure['blogPost'], KeyTypes | Set<KeyTypes>>([
@@ -83,8 +83,8 @@ describe('v3/Normalize', function () {
         ])],
       ]),
       comment: new Map([
-        [1, new Map([['author', 'user1']])],
-        [2, new Map([['author', 'user2']])],
+        [1, new Map<keyof DemoStructure['comment'], KeyTypes | Set<KeyTypes>>([['author', 'user1']])],
+        [2, new Map<keyof DemoStructure['comment'], KeyTypes | Set<KeyTypes>>([['author', 'user2']])],
       ]),
     } satisfies NormalizedData<DemoStructure>['tree']);
     expect(actual).toHaveProperty('entities.role', [

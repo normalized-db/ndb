@@ -18,8 +18,10 @@ export type SchemaConfig<
 } & {
   '@defaults'?: {
     key?: {
-      [K in keyof DataTypes]: ObjectKey<DataTypes[K], KeyTypes>;
+      [EntityKey in keyof DataTypes]: ObjectKey<DataTypes[EntityKey], KeyTypes>;
     }[keyof DataTypes],
+    targets?: PropertiesConfig<DataTypes, any>;
+    dataStore?: DataStoreConfig;
   },
 };
 
@@ -34,6 +36,11 @@ export type ParentConfigReference<DataTypes extends SchemaStructure, AbstractDat
   | (keyof AbstractEntityKey<AbstractDataTypes> & string)
   | (keyof DataTypes & string);
 
+export type DataStoreConfig = {
+  autoKey?: boolean;
+  logging?: StoreLogConfig;
+};
+
 export type EntityConfig<
   DataTypes extends SchemaStructure,
   EntityKey extends keyof DataTypes,
@@ -42,10 +49,7 @@ export type EntityConfig<
   key?: ObjectKey<DataTypes[EntityKey], KeyTypes>;
   parent?: ParentConfigReference<DataTypes, AbstractDataTypes>;
   targets?: PropertiesConfig<DataTypes, EntityKey>;
-  dataStore?: {
-    autoKey?: boolean;
-    logging?: StoreLogConfig;
-  }
+  dataStore?: DataStoreConfig;
 };
 
 export type PropertiesConfig<

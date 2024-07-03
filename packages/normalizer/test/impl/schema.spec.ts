@@ -13,7 +13,7 @@ describe('v3/Schema', function () {
         key: 'id',
         targets: {},
         autoKey: false,
-        logging: { mode: LogMode.Disabled },
+        logging: { mode: LogMode.Simple },
       },
       user: {
         key: 'userName',
@@ -21,7 +21,10 @@ describe('v3/Schema', function () {
           role: { type: 'role', isArray: false, cascadeRemoval: false },
         },
         autoKey: false,
-        logging: { mode: LogMode.Disabled },
+        logging: {
+          mode: LogMode.Full,
+          eventSelection: ['created', 'removed'],
+        },
       },
       blogPost: {
         key: 'id',
@@ -30,7 +33,7 @@ describe('v3/Schema', function () {
           comments: { type: 'comment', isArray: true, cascadeRemoval: true },
         },
         autoKey: false,
-        logging: { mode: LogMode.Disabled },
+        logging: { mode: LogMode.Simple },
       },
       comment: {
         key: 'id',
@@ -38,7 +41,7 @@ describe('v3/Schema', function () {
           author: { type: 'user', isArray: false, cascadeRemoval: false },
         },
         autoKey: false,
-        logging: { mode: LogMode.Disabled },
+        logging: { mode: LogMode.Simple },
       },
     } satisfies Schema<DemoStructure>);
   });

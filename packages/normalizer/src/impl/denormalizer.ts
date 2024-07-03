@@ -102,6 +102,10 @@ export function denormalizer<DataTypes extends SchemaStructure>(
     return {
       fromKey: key => fromKey(type, key, depth),
       fromKeys: keys => fromKeys(type, keys, depth),
+      all: () => {
+        const keys = normalizedData.keyMap[type]?.keys();
+        return keys ? fromKeys(type, [...keys], depth) : [];
+      },
     };
   };
 }

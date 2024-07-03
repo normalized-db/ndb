@@ -134,6 +134,7 @@ export type DenormalizeFunction<
 ) => {
   fromKey: (key: T[KeyPath]) => T,
   fromKeys: (keys: T[KeyPath][]) => T[],
+  all: () => T[],
 };
 
 export type ParentRef<DataTypes extends SchemaStructure, EntityKey extends keyof DataTypes, Key extends KeyTypes> = {

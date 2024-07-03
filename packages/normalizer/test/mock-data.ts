@@ -1,4 +1,4 @@
-import type { AbstractSchemaStructure, SchemaConfig, SchemaStructure } from '../src/types/normalizer-config-types';
+import { type AbstractSchemaStructure, LogMode, type SchemaConfig, type SchemaStructure } from '../src/types/normalizer-config-types';
 
 export interface MockUserRole {
   readonly id: string;
@@ -37,7 +37,7 @@ export interface AbstractDemoSchema extends AbstractSchemaStructure {
 }
 
 export const schemaConfig: SchemaConfig<DemoStructure, AbstractDemoSchema> = {
-  '@defaults': { key: 'id' },
+  '@defaults': { key: 'id', dataStore: { logging: { mode: LogMode.Simple } } },
   '@baseAuthor': {
     targets: { author: 'user' },
   },
@@ -45,6 +45,12 @@ export const schemaConfig: SchemaConfig<DemoStructure, AbstractDemoSchema> = {
   user: {
     key: 'userName',
     targets: { role: 'role' },
+    dataStore: {
+      logging: {
+        mode: LogMode.Full,
+        eventSelection: ['created', 'removed'],
+      },
+    },
   },
   blogPost: {
     parent: '@baseAuthor',
