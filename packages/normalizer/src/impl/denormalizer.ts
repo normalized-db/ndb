@@ -70,7 +70,7 @@ export function denormalizer<DataTypes extends SchemaStructure>(
           }
 
           const nextDepth = Ndb.nextDepth<any>(depth, nestedProperty);
-          // @ts-ignore
+          // @ts-expect-error no index signature found
           const nestedKeys = normalizedData.tree[type]?.[key]?.props?.[nestedProperty];
           denormalizedEntity[nestedProperty as keyof DataTypes[EntityKey]] = Array.isArray(nestedKeys)
             ? fromKeys(target.type, nestedKeys, nextDepth)

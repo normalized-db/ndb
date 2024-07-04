@@ -59,7 +59,7 @@ export function normalizer<DataTypes extends SchemaStructure>(
       const entityTree = Objects.patch(entityTypeTree, key, {});
       if (parent) {
         const refs = Objects.patch(entityTree, 'refs', {});
-        // @ts-ignore
+        // @ts-expect-error parent.key is any-array
         Objects.patch(refs, parent.type, [parent.key], (keys) => Arrays.pushDistinct(keys, parent.key).items);
       }
 
@@ -87,7 +87,7 @@ export function normalizer<DataTypes extends SchemaStructure>(
           const props = Objects.patch(entityTree, 'props', {});
           Objects.patch(
             props,
-            // @ts-ignore
+            // @ts-expect-error nested property is not necessarily a known key
             nestedProperty,
             targetRef,
             (refs) => {

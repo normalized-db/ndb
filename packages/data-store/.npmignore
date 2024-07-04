@@ -10,5 +10,6 @@ index.ts
 
 .gitignore
 .npmignore
+.prettierignore
 tsconfig.json
-tslint.json
+eslint.config.mjs

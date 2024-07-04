@@ -9,7 +9,10 @@ import type { Entity, EntityProperty, Schema } from '../types/normalizer-types';
 
 const defaultsKey: keyof SchemaConfig<any, any> = '@defaults';
 
-export function buildSchema<DataTypes extends SchemaStructure, AbstractDataTypes extends AbstractSchemaStructure = {}>(
+export function buildSchema<
+  DataTypes extends SchemaStructure,
+  AbstractDataTypes extends AbstractSchemaStructure = Record<string, never>
+>(
   config: SchemaConfig<DataTypes, AbstractDataTypes>,
 ): Schema<DataTypes> {
   const schema: Partial<Schema<DataTypes>> = {};

@@ -4,7 +4,10 @@ import { buildSchema } from './impl/schema';
 import type { AbstractSchemaStructure, SchemaConfig, SchemaStructure } from './types/normalizer-config-types';
 import type { DenormalizerFactoryOptions, NormalizedDb, NormalizeOptions } from './types/normalizer-types';
 
-export function normalizedDb<DataTypes extends SchemaStructure, AbstractDataTypes extends AbstractSchemaStructure = {}>(
+export function normalizedDb<
+  DataTypes extends SchemaStructure,
+  AbstractDataTypes extends AbstractSchemaStructure = Record<string, never>,
+>(
   config: SchemaConfig<DataTypes, AbstractDataTypes>,
   globalOptions: {
     normalize?: NormalizeOptions<DataTypes>,

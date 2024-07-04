@@ -2,7 +2,9 @@ import { Objects } from './objects';
 
 export namespace Arrays {
 
-  export function pushDistinct<T extends {}>(items: T[], item: T, eq: (item1: T, item2: T) => boolean): { items: T[], index: number };
+  export function pushDistinct<T extends Record<string, unknown>>(
+    items: T[], item: T, eq: (item1: T, item2: T) => boolean,
+  ): { items: T[], index: number };
   export function pushDistinct<T extends string | number>(items: T[], item: T): { items: T[], index: number };
   export function pushDistinct<T>(items: T[], item: T, eq?: (item1: T, item2: T) => boolean): { items: T[], index: number } {
     let index = eq ? items.findIndex(other => eq(other, item)) : items.indexOf(item);
@@ -13,7 +15,9 @@ export namespace Arrays {
     return { items, index };
   }
 
-  export function upsert<T extends {}>(items: T[], item: T, eq: (item1: T, item2: T) => boolean): { items: T[], index: number } {
+  export function upsert<T extends Record<string, unknown>>(
+    items: T[], item: T, eq: (item1: T, item2: T) => boolean,
+  ): { items: T[], index: number } {
     let index = eq ? items.findIndex(other => eq(other, item)) : items.indexOf(item);
     if (index < 0) {
       index = items.length;
@@ -24,7 +28,7 @@ export namespace Arrays {
     return { items, index };
   }
 
-  export function merge<T extends {}>(items1: T[], items2: T[], eq: (item1: T, item2: T) => boolean): T[] {
+  export function merge<T extends Record<string, unknown>>(items1: T[], items2: T[], eq: (item1: T, item2: T) => boolean): T[] {
     const merged = items1.map(other => ({ ...other }));
     for (const other of items2) {
       upsert(merged, other, eq);

@@ -10,7 +10,7 @@ export type ObjectKey<T, WhereExtends = any> = {
 
 export type SchemaConfig<
   DataTypes extends SchemaStructure,
-  AbstractDataTypes extends AbstractSchemaStructure = {}
+  AbstractDataTypes extends AbstractSchemaStructure = Record<string, never>
 > = {
   [EntityKey in keyof DataTypes]: EntityConfig<DataTypes, EntityKey, AbstractDataTypes>
 } & {
