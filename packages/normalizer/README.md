@@ -260,10 +260,17 @@ const { normalizer, denormalizer } = normalizedDb<DemoStructure, AbstractDemoSch
 
 const normalizedData = normalize('blogPosts', blogPosts);
 
-const blogPost1: BlogPost = denormalizer.fromData(normalizedData)
+const blogPost1: BlogPost = denormalizer
+  .withData(normalizedData)
     .ofType('blogPost')
     .fromKey(1);
 ```
+
+If you need to restore data, e.g. from *IndexedDB*, you need to store the `NormalizedData.tree` property somewhere, e.g. serialize it
+into web storage. Then, use `preload()` instead of `withData()`. This will use the meta information from the tree to determine the
+entity types and respective unique keys required for restoring a particular slice of the original data structure.
+
+Keep in mind, that the tree data has to be merged everytime new data is normalized. You can use `Objects.merge()` to do so.
 
 ## Design considerations
 Note that normalization is not the solution to everything. In fact, in many cases it would be absolutely redundant to

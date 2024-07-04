@@ -1,11 +1,81 @@
 import { describe, expect, it } from '@jest/globals';
 import { normalizedDb } from '../../src/main';
-import type { NormalizedData } from '../../src/types/normalizer-types';
+import type { KeyTypes } from '../../src/types/normalizer-config-types';
+import type { NormalizedData, NormalizedDataTree } from '../../src/types/normalizer-types';
 import { type AbstractDemoSchema, type DemoStructure, type MockBlogPost, MockData, schemaConfig } from '../mock-data';
+
+/**
+ * This function actually loads the entire mock data objects, i.e., denormalization does not do anything
+ * @param type
+ * @param keys
+ */
+async function loadEntities(type: keyof DemoStructure, keys: KeyTypes[]) {
+  switch (type) {
+    case 'role':
+      return [MockData.roleAdmin, MockData.roleUser].filter(d => keys.includes(d.id));
+    case 'user':
+      return [MockData.user1, MockData.user2].filter(d => keys.includes(d.userName));
+    case 'blogPost':
+      return [MockData.blogPost1, MockData.blogPost2].filter(d => keys.includes(d.id));
+    case 'comment':
+      return [MockData.blogPost1, MockData.blogPost2]
+        .map(d => d.comments)
+        .reduce((all, next) => all.concat(next), [])
+        .filter(d => keys.includes(d.id));
+    default:
+      return [];
+  }
+}
 
 describe('Denormalize', function () {
 
   const { denormalizer } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+
+  describe('Preload', function () {
+    it('Find and preload entities', async function () {
+      const tree: NormalizedDataTree<DemoStructure> = {
+        role: {
+          admin: { refs: { user: ['user1'] } },
+          standard: { refs: { user: ['user2'] } },
+        },
+        user: {
+          user1: { props: { role: 'admin' }, refs: { blogPost: [1], comment: [2, 3] } },
+          user2: { props: { role: 'standard' }, refs: { blogPost: [2], comment: [1] } },
+        },
+        blogPost: {
+          1: { props: { author: 'user1', comments: [1, 2] } },
+          2: { props: { author: 'user2', comments: [3] } },
+        },
+        comment: {
+          1: { props: { author: 'user2' }, refs: { blogPost: [1] } },
+          2: { props: { author: 'user1' }, refs: { blogPost: [1] } },
+          3: { props: { author: 'user2' }, refs: { blogPost: [2] } },
+        },
+      };
+
+      const { denormalizer } = normalizedDb<DemoStructure, AbstractDemoSchema>(schemaConfig);
+      const { normalizedData: actual } = await denormalizer.preload(
+        tree,
+        'blogPost',
+        loadEntities,
+        {
+          keys: 1,
+          depth: { author: 0, comments: 0 },
+        },
+      );
+
+      expect(actual).toHaveProperty('keyMap', {
+        user: { user1: 0 },
+        blogPost: { 1: 0 },
+        comment: { 1: 0, 2: 1 },
+      } satisfies NormalizedData<DemoStructure>['keyMap']);
+
+      expect(actual).toHaveProperty('tree', tree);
+      expect(actual).toHaveProperty('entities.user', [MockData.user1]);
+      expect(actual).toHaveProperty('entities.blogPost', [MockData.blogPost1]);
+      expect(actual).toHaveProperty('entities.comment', MockData.blogPost1.comments);
+    });
+  });
 
   it('Role', function () {
     const normalizedData: NormalizedData<DemoStructure> = {
@@ -19,7 +89,7 @@ describe('Denormalize', function () {
       },
     };
 
-    const typedDenormalizer = denormalizer.fromData(normalizedData).ofType('role');
+    const typedDenormalizer = denormalizer.withData(normalizedData).ofType('role');
     const actual1 = typedDenormalizer.fromKey('admin');
 
     expect(actual1).toEqual(MockData.roleAdmin);
@@ -62,7 +132,7 @@ describe('Denormalize', function () {
       },
     };
 
-    const [actual1, actual2] = denormalizer.fromData(normalizedData)
+    const [actual1, actual2] = denormalizer.withData(normalizedData)
       .ofType('user')
       .fromKeys(['user1', 'user2']);
 
@@ -119,14 +189,14 @@ describe('Denormalize', function () {
     };
 
     it('Blog post', function () {
-      const actual1 = denormalizer.fromData(normalizedData)
+      const actual1 = denormalizer.withData(normalizedData)
         .ofType('blogPost')
         .fromKey(1);
       expect(actual1).toEqual(MockData.blogPost1);
     });
 
     it('Blog post with numeric depth', function () {
-      const actual = denormalizer.fromData(normalizedData)
+      const actual = denormalizer.withData(normalizedData)
         .ofType('blogPost', { depth: 1 })
         .fromKey(1);
 
@@ -142,7 +212,7 @@ describe('Denormalize', function () {
     });
 
     it('Blog post with property-specific depth', function () {
-      const actual = denormalizer.fromData(normalizedData)
+      const actual = denormalizer.withData(normalizedData)
         .ofType('blogPost', {
           depth: {
             author: 2,

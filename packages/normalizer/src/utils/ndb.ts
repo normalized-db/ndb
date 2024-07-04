@@ -1,92 +1,5 @@
 import type { KeyTypes, ObjectKey, SchemaStructure } from '../types/normalizer-config-types';
-import type { Depth, NormalizedDataTree, PreloadEntities, Schema, UtilsFunction } from '../types/normalizer-types';
-
-export function buildTools<DataTypes extends SchemaStructure>(
-  schema: Schema<DataTypes>,
-): UtilsFunction<DataTypes> {
-
-  function findEntityKeys<
-    EntityType extends keyof DataTypes,
-    KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
-    Key extends DataTypes[EntityType][KeyPath],
-  >(
-    tree: NormalizedDataTree<DataTypes>,
-    rootType: EntityType,
-    { rootKeys, depth: rootDepth }: {
-      rootKeys?: Key | Key[],
-      depth?: Depth,
-    } = {},
-  ) {
-    const { entities, addEntities, hasVisited } = entityMap<DataTypes>();
-    traverse(
-      rootType,
-      rootKeys === undefined
-        ? undefined
-        : Array.isArray(rootKeys)
-          ? new Set(rootKeys)
-          : new Set([rootKeys]),
-      rootDepth,
-    );
-
-    function traverse<
-      EntityType extends keyof DataTypes,
-      KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
-      Key extends DataTypes[EntityType][KeyPath]
-    >(
-      type: EntityType,
-      keys: Set<Key> | undefined,
-      depth: Depth | undefined,
-    ) {
-      if (depth === 0) {
-        return;
-      }
-
-      const typeSchema = schema[type];
-      if (!typeSchema) {
-        throw new Error(`Missing schema for type ${String(type)}`);
-      }
-
-      const typeTree = tree[type];
-      if (!typeTree) {
-        throw new Error(`Missing data for type ${String(type)}`);
-      }
-
-      for (const entityKey in typeTree) {
-        const typedEntityKey = (isNaN(+entityKey) ? entityKey : +entityKey) as Key;
-        if ((keys !== undefined && !keys.has(typedEntityKey)) || hasVisited(type, entityKey)) {
-          continue;
-        }
-
-        addEntities(type, typedEntityKey);
-
-        const nestedEntities = typeTree[typedEntityKey]?.props;
-        if (!nestedEntities) {
-          continue;
-        }
-
-        for (const nestedProperty in nestedEntities) {
-          const target = typeSchema.targets[nestedProperty];
-          if (!target) {
-            throw new Error(`Missing target for ${String(type)}.${String(nestedProperty)}`);
-          }
-
-          const nestedKeys = nestedEntities[nestedProperty as keyof typeof nestedEntities];
-          if (nestedKeys) {
-            const nextKeys = Array.isArray(nestedKeys) ? new Set(nestedKeys) : new Set([nestedKeys]);
-            const nextDepth = typeof depth === 'number' ? depth - 1 : depth?.[nestedProperty];
-            traverse(target.type, nextKeys, nextDepth);
-          }
-        }
-      }
-    }
-
-    return entities;
-  }
-
-  return {
-    findEntityKeys,
-  };
-}
+import type { Depth, NormalizedDataTree, PreloadEntities, Schema } from '../types/normalizer-types';
 
 function entityMap<DataTypes extends SchemaStructure>() {
   const entities: PreloadEntities<DataTypes> = new Map();
@@ -110,4 +23,98 @@ function entityMap<DataTypes extends SchemaStructure>() {
   }
 
   return { entities, addEntities, hasVisited };
+}
+
+export namespace Ndb {
+
+  export function findEntityKeys<
+    DataTypes extends SchemaStructure,
+    EntityType extends keyof DataTypes,
+    KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
+    Key extends DataTypes[EntityType][KeyPath],
+  >(
+    schema: Schema<DataTypes>,
+    tree: NormalizedDataTree<DataTypes>,
+    rootType: EntityType,
+    { keys: rootKeys, depth: rootDepth }: { keys?: Key | Key[], depth?: Depth<DataTypes[EntityType]> } = {},
+  ) {
+    const { entities, addEntities, hasVisited } = entityMap<DataTypes>();
+    traverse(
+      rootType,
+      rootKeys === undefined
+        ? undefined
+        : Array.isArray(rootKeys)
+          ? new Set(rootKeys)
+          : new Set([rootKeys]),
+      rootDepth as any,
+    );
+
+    function traverse<
+      EntityType extends keyof DataTypes,
+      KeyPath extends ObjectKey<DataTypes[EntityType], KeyTypes>,
+      Key extends DataTypes[EntityType][KeyPath]
+    >(
+      type: EntityType,
+      keys: Set<Key> | undefined,
+      depth: Depth | undefined,
+    ) {
+      const typeSchema = schema[type];
+      if (!typeSchema) {
+        throw new Error(`Missing schema for type ${String(type)}`);
+      }
+
+      const typeTree = tree[type];
+      if (!typeTree) {
+        throw new Error(`Missing data for type ${String(type)}`);
+      }
+
+      for (const entityKey in typeTree) {
+        const typedEntityKey = (isNaN(+entityKey) ? entityKey : +entityKey) as Key;
+        if ((keys !== undefined && !keys.has(typedEntityKey)) || hasVisited(type, entityKey)) {
+          continue;
+        }
+
+        addEntities(type, typedEntityKey);
+
+        if (Ndb.isDone<any>(depth)) {
+          continue;
+        }
+
+        const nestedEntities = typeTree[typedEntityKey]?.props;
+        if (!nestedEntities) {
+          continue;
+        }
+
+        for (const nestedProperty in nestedEntities) {
+          const target = typeSchema.targets[nestedProperty];
+          if (!target) {
+            throw new Error(`Missing target for ${String(type)}.${String(nestedProperty)}`);
+          }
+
+          const nestedKeys = nestedEntities[nestedProperty as keyof typeof nestedEntities];
+          if (nestedKeys) {
+            const nextKeys = Array.isArray(nestedKeys) ? new Set(nestedKeys) : new Set([nestedKeys]);
+            traverse(target.type, nextKeys, Ndb.nextDepth<any>(depth, nestedProperty));
+          }
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  export function nextDepth<T = any>(depth: Depth<T> | undefined, nestedProperty: keyof T): Depth<T> | undefined {
+    if (typeof depth === 'number') {
+      return depth - 1;
+    } else if (depth) {
+      return depth[nestedProperty] ?? 0;
+    } else {
+      return undefined;
+    }
+  }
+
+  export function isDone<T = any>(depth: Depth<T> | undefined): boolean {
+    return typeof depth === 'number' && depth <= 0;
+  }
+
 }
